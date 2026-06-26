@@ -15,7 +15,7 @@ function Hero(){
                 </span>
                 </div>
                 <div className='flex justify-center items-center'>
-                    <span className='text-gray-400 text-lg'>One word, One lie, one imposter</span>
+                    <span className='text-gray-400 text-lg'>One word, One lier, Find them.</span>
                 </div>
         </div>
     )
