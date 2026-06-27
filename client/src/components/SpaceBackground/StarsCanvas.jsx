@@ -10,38 +10,58 @@ function StarsCanvas(){
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        const stars = []; 
+        let animationId;
+        let stars = []; 
 
-        for (let i = 0; i < 150; i++) {
-            stars.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                radius: Math.random() * 1 +1,
-                speed: Math.random() * 0.5 + 0.2,
-            });
-        }
+        const createStars = () => {
+            stars = [];
 
-        function animate(){
+            for (let i = 0; i < 150; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 1 + 1,
+                    speed: Math.random() * 0.5 + 0.2,
+                });
+            }
+        };
+
+        const resizeCanvas = () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            createStars();
+        };
+
+        resizeCanvas();
+
+        const animate = () => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
+
             stars.forEach((star) => {
                 star.y += star.speed;
 
-                if(star.y > canvas.height){
+                if (star.y > canvas.height) {
                     star.y = 0;
-                    star.x = Math.random() *canvas.width;
+                    star.x = Math.random() * canvas.width;
                 }
 
                 ctx.beginPath();
-                ctx.arc(star.x, star.y, star.radius, 0, Math.PI *2);
-                ctx.fillStyle= "white";
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fillStyle = "white";
                 ctx.fill();
             });
 
-            requestAnimationFrame(animate);
-        }
+            animationId = requestAnimationFrame(animate);
+        };
 
         animate();
+         window.addEventListener("resize", resizeCanvas);
+
+        return () => {
+            cancelAnimationFrame(animationId);
+            window.removeEventListener("resize", resizeCanvas);
+        };
 
     },[])
 
