@@ -11,7 +11,7 @@ function Lobby(){
         <div>
             <StarsCanvas/>
             <NavBar/>
-            <div className="p-4 grid gap-4 grid-cols-2 max-[630px]:grid-cols-1 ">
+            <div className="p-4 grid gap-4 grid-cols-2 max-[630px]:grid-cols-1 min-h-[570px] ">
                 <PlayersList/>
                 <Chat/>
                 

@@ -1,6 +1,7 @@
 import { IoSettingsSharp } from "react-icons/io5";
-
+import { useGame } from "../context/GameContext";
 function NavBar(){
+    const {room} = useGame()
     return(
         <nav>
                 <div className="flex p-2 bg-zinc-500/10 backdrop-blur-sm justify-between items-center">
@@ -28,7 +29,7 @@ function NavBar(){
                                 </span>
                             </div> 
                             <span className="text-red-500 font-bold text-3xl leading-none">
-                                A8KD29
+                                {room.roomCode}
                             </span>
                         </div>
                         <div className=" font-mono text-white">

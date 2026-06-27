@@ -1,95 +1,110 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import { connectSocket } from '../sockets/socket'
 
+import * as LobbyAction from '../game/lobbyActions';
+
 const GameContext = createContext()
 
 export function GameProvider({ children }) {
-  const [screen, setScreen]         = useState('lobby')
+  const [socketId, setSocketId] = useState(null);
+  const [connected, setConnected] = useState(false);
+
+  const [screen, setScreen]         = useState('home')
+
   const [room, setRoom]             = useState(null)
   const [playerName, setPlayerName] = useState('')
   const [myWord, setMyWord]         = useState(null)
+
   const [error, setError]           = useState(null)
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const socket = connectSocket()
 
-    socket.on('room-created',  (room) => { setRoom(room); setScreen('lobby') })
-    socket.on('room-updated',  (room) => { setRoom(room) })
-    socket.on('room-error',    (msg)  => { setError(msg) })
+    socket.on("connect", () => {
+      setConnected(true);
+      setSocketId(socket.id);
+      setError(null);
 
-    socket.on('player-kicked', () => {
-      setRoom(null)
-      setScreen('home')
-      setError('You were kicked from the room')
     })
 
-    socket.on('your-word', ({ word, role }) => {
-      setMyWord({ word, role })
-    })
+    socket.on("connect_error", () => {
+        setConnected(false);
+        setError("Unable to connect to the server.");
+    });
 
-    socket.on('phase-change', ({ phase, ...rest }) => {
-      setScreen(phase)
-      setRoom(prev => ({ ...prev, ...rest }))
-    })
+    socket.on("disconnect", () => {
+    setConnected(false);
+    setSocketId(null);
+});
+    socket.on("room-created", (room) => {
+      setLoading(false);
+      setError(null);
 
-    socket.on('next-turn', (data) => {
-      setRoom(prev => ({ ...prev, currentTurn: data }))
-    })
+      setRoom(room);
+      setScreen("lobby");
+    });
 
-    socket.on('hint-received', ({ name, hint }) => {
-      setRoom(prev => ({
-        ...prev,
-        hints: [...(prev.hints || []), { name, hint }]
-      }))
-    })
+    socket.on("room-joined", (room) => {
+      setLoading(false);
+      setError(null);
 
-    socket.on('vote-received', ({ voter, votedFor }) => {
-      setRoom(prev => ({
-        ...prev,
-        votes: { ...(prev.votes || {}), [voter]: votedFor }
-      }))
-    })
+      setRoom(room);
+      setScreen("lobby");
+    });
 
-    socket.on('round-result', (result) => {
-      setScreen('round-result')
-      setRoom(prev => ({ ...prev, lastRoundResult: result }))
-    })
+    socket.on("room-error", (message) => {
+      setLoading(false);
+      setError(message);
+    });
 
-    socket.on('game-result', (result) => {
-      setScreen('game-result')
-      setRoom(prev => ({ ...prev, gameResult: result }))
-    })
-
-    socket.on('chat-message', (msg) => {
-      setRoom(prev => ({
-        ...prev,
-        messages: [...(prev.messages || []), msg]
-      }))
-    })
-
+    socket.on("player-join", (room) =>{
+      console.log("mess");
+      setRoom(room);
+    });
     return () => {
-      socket.off('room-created')
-      socket.off('room-updated')
-      socket.off('room-error')
-      socket.off('player-kicked')
-      socket.off('your-word')
-      socket.off('phase-change')
-      socket.off('next-turn')
-      socket.off('hint-received')
-      socket.off('vote-received')
-      socket.off('round-result')
-      socket.off('game-result')
-      socket.off('chat-message')
-    }
-  }, [])
+      socket.off("connect");
+      socket.off("connect_error");
+      socket.off("disconnect");
+      socket.off("room-created");
+      socket.off("room-joined");
+      socket.off("room-error");
+      socket.off("player-join")
+    };
+  }, []);
+
+  const createRoom = (playerName) =>
+    LobbyAction.createRoom({
+      playerName,
+      setLoading,
+      setError,
+    });
+  
+    const joinRoom = (roomCode, playerName) => 
+      LobbyAction.joinRoom({
+        roomCode,
+        playerName,
+        setLoading,
+        setError,
+        error
+      });
+  
 
   return (
     <GameContext.Provider value={{
-      screen, setScreen,
-      room,   setRoom,
-      playerName, setPlayerName,
+      room,
+      screen, 
+      connected,   
+      playerName, 
       myWord,
-      error,  setError,
+      error,  
+      loading, 
+      socketId,
+
+      setPlayerName,
+
+      createRoom,
+      joinRoom,
     }}>
       {children}
     </GameContext.Provider>
