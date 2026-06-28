@@ -10,9 +10,8 @@ function createRoomObject(roomCode, hostId, hostName) {
 
     settings: {
       maxPlayers: 8,
-      minPlayers: 3,
-      hintTimer: 60,
-      category: 'Mixed',
+      hintTime: 60,
+      voteTime: 60,
     },
 
     words: {
@@ -104,7 +103,7 @@ function joinRoom(roomCode, playerId, playerName) {
     const nameTaken = room.players.find(p => p.name.toLowerCase() === playerName.toLowerCase());
 
     if(nameTaken){
-        return { error: 'Name already taken iin this room.'};
+        return { error: 'Name already taken in this room.'};
     } 
 
     const alreadyIn = room.players.find(p => p.id === playerId);
@@ -118,6 +117,7 @@ function joinRoom(roomCode, playerId, playerName) {
 }
 
 function removePlayer(roomCode, socketId){
+    roomCode = roomCode.toUpperCase();
 
     const room = rooms.get(roomCode);
     if(!room) return {error: 'Room not found.'};
@@ -130,10 +130,21 @@ function removePlayer(roomCode, socketId){
     room.players.splice(playerIndex, 1);
     connections.delete(socketId);
 
-    return { room, player };
+    if (room.players.length === 0) {
+        rooms.delete(roomCode);
+        return { room, player, deleted: true };
+    }
+
+    if (player.isHost) {
+        room.hostId = room.players[0].id;
+        room.players[0].isHost = true;
+    }
+
+    return { room, player, deleted: false };
 }
 
 function togglePlayer(roomCode, socketId){
+    roomCode = roomCode.toUpperCase();
 
     const room = rooms.get(roomCode);
     if(!room) return {error: 'Room not found.'};
@@ -146,9 +157,21 @@ function togglePlayer(roomCode, socketId){
     return { room, };
 }
 
+function getRoom(roomCode) {
+    if (!roomCode) return null;
+    return rooms.get(roomCode.toUpperCase());
+}
+
+function isRoomHost(roomCode, socketId) {
+    const room = getRoom(roomCode);
+    return Boolean(room && room.hostId === socketId);
+}
+
 module.exports = {
     createRoom,
     joinRoom,
     removePlayer,
     togglePlayer,
+    getRoom,
+    isRoomHost,
 };

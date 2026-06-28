@@ -1,9 +1,8 @@
-import { useGame } from "../context/GameContext";
+import { useGame } from "../hooks/useGame";
 import StarsCanvas from "../components/SpaceBackground/StarsCanvas";
 import PlayersList from "../components/PlayersList"
 import NavBar from "../components/NavBar";
 import Chat from "../components/Chat";
-import { IoSettingsSharp } from "react-icons/io5";
 
 
 function Lobby(){

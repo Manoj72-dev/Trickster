@@ -1,9 +1,14 @@
 import { IoSettingsSharp } from "react-icons/io5";
-import { useGame } from "../context/GameContext";
+import { useGame } from "../hooks/useGame";
+import { useState } from "react";
+
+import GameSetting from "./GameSetting";
 function NavBar(){
+    const [showSettings, setShowSettings] = useState(false);
     const {room} = useGame()
     return(
-        <nav>
+        <div>
+            <nav>
                 <div className="flex p-2 bg-zinc-500/10 backdrop-blur-sm justify-between items-center">
                     <div>
                         <span 
@@ -34,6 +39,7 @@ function NavBar(){
                         </div>
                         <div className=" font-mono text-white">
                             <button 
+                                onClick={() => setShowSettings(true)}
                                 className=" flex py-1 justify-center items-center gap-2 border rounded-lg px-2 bg-black 
                                 hover:scale-105 hover:bg-white hover:text-black
                                 active:scale-95
@@ -47,7 +53,12 @@ function NavBar(){
                         </div>
                     </div>
                 </div>
+                
             </nav>
+            {showSettings && (
+                <GameSetting close={() => setShowSettings(false)} />
+            )}
+        </div>
     )
 }
 

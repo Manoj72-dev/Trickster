@@ -1,10 +1,12 @@
 const EVENTS = require("../constants/events");
-const {rooms, connections} = require("../store/rooms");
+const { rooms, connections } = require("../store/rooms");
 const {
     createRoom,
     joinRoom,
     removePlayer,
     togglePlayer,
+    isRoomHost,
+    getRoom,
 } = require("../services/roomService");
 
 module.exports = (io, socket) => {
@@ -75,13 +77,29 @@ module.exports = (io, socket) => {
             result.room
         );
 
-        io.to(roomCode).emit(EVENTS.LOBBY_UPDATED, {
+        io.to(result.room.roomCode).emit(EVENTS.LOBBY_UPDATED, {
             room: result.room,
             message: `${playerName} join the lobby`
         });
     });
 
     socket.on(EVENTS.PLAYER_KICK,({ roomCode, playerId}) => {
+        if (!isRoomHost(roomCode, socket.id)) {
+            socket.emit(
+                EVENTS.ROOM_ERROR,
+                "Only the host can kick players."
+            );
+            return;
+        }
+
+        if (playerId === socket.id) {
+            socket.emit(
+                EVENTS.ROOM_ERROR,
+                "Host cannot kick themselves."
+            );
+            return;
+        }
+
         const result = removePlayer(roomCode, playerId);
 
         if (result.error) {
@@ -95,9 +113,9 @@ module.exports = (io, socket) => {
         io.to(playerId).emit(EVENTS.LOBBY_EXIT);
 
         const kickedSocket = io.sockets.sockets.get(playerId);
-        if (kickedSocket) kickedSocket.leave(roomCode);
+        if (kickedSocket) kickedSocket.leave(result.room.roomCode);
 
-        io.to(roomCode).emit(EVENTS.LOBBY_UPDATED, {
+        io.to(result.room.roomCode).emit(EVENTS.LOBBY_UPDATED, {
             room: result.room,
             message: `${result.player.name} was kicked`
         });
@@ -115,20 +133,15 @@ module.exports = (io, socket) => {
             return;
         }
         const room = result.room
-        socket.leave(roomCode)
-        if(room.players.length === 0){
-            rooms.delete(roomCode);
+        socket.leave(room.roomCode)
+        if(result.deleted){
             socket.emit(EVENTS.LOBBY_EXIT);
             return;
         }
 
-        if (result.player.isHost) {
-            room.players[0].isHost = true;
-        }
-
         socket.emit(EVENTS.LOBBY_EXIT);
 
-        io.to(roomCode).emit(EVENTS.LOBBY_UPDATED, {
+        io.to(room.roomCode).emit(EVENTS.LOBBY_UPDATED, {
             room,
             message: `${result.player.name} left the room`
         });
@@ -145,9 +158,40 @@ module.exports = (io, socket) => {
             );
             return;
         }
-        io.to(roomCode).emit(EVENTS.LOBBY_UPDATED, {
+        io.to(result.room.roomCode).emit(EVENTS.LOBBY_UPDATED, {
             room :result.room
         });
     })
+
+    socket.on("disconnect", () => {
+        const connection = connections.get(socket.id);
+        if (!connection) return;
+
+        const result = removePlayer(connection.roomCode, socket.id);
+        if (result.error || result.deleted) return;
+
+        io.to(result.room.roomCode).emit(EVENTS.LOBBY_UPDATED, {
+            room: result.room,
+            message: `${result.player.name} disconnected`
+        });
+    });
+    socket.on(EVENTS.ROOM_SETTING_CHANGE, ({ roomCode, settings }) => {
+        const room = getRoom(roomCode);
+        if (!room) return;
+
+        const player = room.players.find(p => p.id === socket.id);
+
+        if (!player || !player.isHost) {
+            return;
+        }
+
+        room.settings = settings;
+        console.log(room);
+        io.to(roomCode).emit(EVENTS.LOBBY_UPDATED, {
+            room: room,
+            message:`{}`,
+
+        });
+    });
 
 };

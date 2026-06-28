@@ -15,5 +15,5 @@ module.exports = {
     PLAYER_KICK: "player-kick",
 
     LOBBY_UPDATED: "lobby-updated",
-
+    ROOM_SETTING_CHANGE: "room-setting-change",
 };

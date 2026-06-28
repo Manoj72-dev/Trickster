@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence} from 'framer-motion';
+import { useCallback, useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 function HowTo(){
     const steps = [
@@ -13,7 +13,7 @@ function HowTo(){
             id: 2,
             title: "RECEIVE YOUR SECRET WORD",
             description:
-            "Every player receives a secret word. Most players get the exact same word, while one player—the Imposter—receives a similar but different word. Keep your word private ."
+            "Every player receives a secret word. Most players get the exact same word, while one player - the Imposter - receives a similar but different word. Keep your word private."
         },
         {
             id: 3,
@@ -31,13 +31,13 @@ function HowTo(){
             id: 5,
             title: "CAST YOUR VOTE",
             description:
-            "When the discussion ends, every player votes for the person they believe is the Imposter. Choose wisely—one wrong vote could allow the Imposter to escape."
+            "When the discussion ends, every player votes for the person they believe is the Imposter. Choose wisely - one wrong vote could allow the Imposter to escape."
         },
         {
             id: 6,
             title: "REVEAL THE WINNER",
             description:
-            "If the majority correctly identifies the Imposter, the other players win. If the Imposter survives -or successfully guesses the common word after being caught—they steal the victory."
+            "If the majority correctly identifies the Imposter, the other players win. If the Imposter survives - or successfully guesses the common word after being caught - they steal the victory."
         }
     ];
 
@@ -45,15 +45,15 @@ function HowTo(){
     const [isPause, setIsPause] = useState(false);
     const [direction, setDirection] = useState(1);
 
-    const nextStep = () =>{
+    const nextStep = useCallback(() =>{
         setDirection(1);
         setCurrentStep((prev) => (prev+1) % steps.length);
-    };
+    }, [steps.length]);
 
-    const prevStep = () =>{
+    const prevStep = useCallback(() =>{
         setDirection(-1);
         setCurrentStep((prev)=> prev ===0 ? steps.length-1 : prev-1);
-    };
+    }, [steps.length]);
 
 
     useEffect(() =>{
@@ -63,7 +63,7 @@ function HowTo(){
         }, 4000);
 
         return () => clearInterval(interval);
-    }, [isPause])
+    }, [isPause, nextStep])
 
     const step = steps[currentStep];
     return(

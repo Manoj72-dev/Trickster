@@ -8,9 +8,8 @@ function createRoomObject(roomCode, hostId, hostName) {
 
     settings: {
       maxPlayers: 8,
-      minPlayers: 3,
-      hintTimer: 60,
-      category: 'Mixed',
+      hintTime: 60,
+      voteTime: 60,
     },
 
     words: {

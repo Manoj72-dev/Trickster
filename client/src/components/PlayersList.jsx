@@ -1,4 +1,4 @@
-import { useGame } from "../context/GameContext";
+import { useGame } from "../hooks/useGame";
 
 import { ImCross } from "react-icons/im";
 

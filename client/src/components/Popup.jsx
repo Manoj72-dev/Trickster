@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { useGame } from "../context/GameContext";
+import { useGame } from "../hooks/useGame";
 
 function Popup({ type, close }) {
   const {

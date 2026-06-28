@@ -1,9 +1,9 @@
-import { createContext, useContext, useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { connectSocket } from '../sockets/socket'
+import { EVENTS } from '../constants/events'
+import { GameContext } from './GameContextObject'
 
 import * as LobbyAction from '../game/lobbyActions';
-
-const GameContext = createContext()
 
 export function GameProvider({ children }) {
   const [socketId, setSocketId] = useState(null);
@@ -13,7 +13,7 @@ export function GameProvider({ children }) {
 
   const [room, setRoom]             = useState(null)
   const [playerName, setPlayerName] = useState('')
-  const [myWord, setMyWord]         = useState(null)
+  const [myWord]                    = useState(null)
 
   const [error, setError]           = useState(null)
   const [loading, setLoading] = useState(false);
@@ -42,7 +42,7 @@ export function GameProvider({ children }) {
 
     });
 
-    socket.on("room-created", (room) => {
+    socket.on(EVENTS.ROOM_CREATED, (room) => {
       setLoading(false);
       setError(null);
 
@@ -50,7 +50,7 @@ export function GameProvider({ children }) {
       setScreen("lobby");
     });
 
-    socket.on("room-joined", (room) => {
+    socket.on(EVENTS.ROOM_JOINED, (room) => {
       setLoading(false);
       setError(null);
 
@@ -58,31 +58,30 @@ export function GameProvider({ children }) {
       setScreen("lobby");
     });
 
-    socket.on("room-error", (message) => {
+    socket.on(EVENTS.ROOM_ERROR, (message) => {
       setLoading(false);
       setError(message);
     });
 
-    socket.on("lobby-exit", () =>{
+    socket.on(EVENTS.LOBBY_EXIT, () =>{
       setScreen("home")
       setRoom(null)
       setPlayerName("")
     })
 
-    socket.on("lobby-updated", ({ room, message }) => {
+    socket.on(EVENTS.LOBBY_UPDATED, ({ room }) => {
       setRoom(room);
-      console.log(message);
     });
 
     return () => {
       socket.off("connect");
       socket.off("connect_error");
       socket.off("disconnect");
-      socket.off("room-created");
-      socket.off("room-joined");
-      socket.off("room-error");
-      socket.off("lobby-exit");
-      socket.off("lobby-updated");
+      socket.off(EVENTS.ROOM_CREATED);
+      socket.off(EVENTS.ROOM_JOINED);
+      socket.off(EVENTS.ROOM_ERROR);
+      socket.off(EVENTS.LOBBY_EXIT);
+      socket.off(EVENTS.LOBBY_UPDATED);
     };
   }, []);
 
@@ -122,6 +121,10 @@ export function GameProvider({ children }) {
       setError,
     })
   }
+
+  const changeSetting = (roomCode, settings) => {
+    LobbyAction.changeSetting({roomCode, settings})
+  }
   return (
     <GameContext.Provider value={{
       room,
@@ -140,12 +143,9 @@ export function GameProvider({ children }) {
       kickPlayer,
       leaveLobby,
       toggleReady,
+      changeSetting,
     }}>
       {children}
     </GameContext.Provider>
   )
-}
-
-export function useGame() {
-  return useContext(GameContext)
 }
