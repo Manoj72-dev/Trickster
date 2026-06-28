@@ -1,5 +1,7 @@
 const http = require("http");
 const { Server } = require("socket.io");
+const logger      = require('./middleware/logger');
+const rateLimiter = require('./middleware/rateLimiter');
 
 const app = require("./app");
 
@@ -13,6 +15,9 @@ const io = new Server(server, {
         methods: ["GET", "POST"],
     },
 })
+
+io.use(logger);
+io.use(rateLimiter);
 
 registerSocketHandlers(io);
 

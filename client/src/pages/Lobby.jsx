@@ -7,6 +7,9 @@ import { IoSettingsSharp } from "react-icons/io5";
 
 
 function Lobby(){
+    const { leaveLobby,toggleReady, room, socketId } = useGame()
+    const me = room?.players.find(p => p.id === socketId);
+
     return(
         <div>
             <StarsCanvas/>
@@ -19,16 +22,18 @@ function Lobby(){
             </div>
                 <div className="text-white flex justify-between p-2 font-mono">
                     <div className="flex gap-6 ml-2">
-                        <button className="font-bold border rounded-xl p-2 
-                            hover:bg-white hover:text-black hover:scale-110
-                            active:bg-white active:text-black active:scale-95
-                            transition duration-300 text-xl">
-                            Ready
+                        <button onClick={() => toggleReady(room.roomCode)}
+                            className={`font-bold border rounded-xl p-2 transition duration-300 text-xl
+                                ${me?.isReady 
+                                    ? 'bg-white text-black' 
+                                    : 'hover:bg-white hover:text-black hover:scale-110'}`}>
+                            {me?.isReady ? 'Not ready' : 'Ready'}
                         </button>
                         <button className="font-bold border rounded-xl p-2
                             hover:bg-white hover:text-black hover:scale-110
                             active:bg-white active:text-black active:scale-95
-                            transition duration-300 text-xl">
+                            transition duration-300 text-xl"
+                            onClick={() => leaveLobby(room.roomCode)}>
                             Leave
                         </button>
                     </div>

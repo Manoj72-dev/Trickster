@@ -1,10 +1,19 @@
 module.exports = {
 
-    CREATE_ROOM: "room-create",
-    JOIN_ROOM: "room-join",
-
+    ROOM_CREATE: "room-create",
     ROOM_CREATED: "room-created",
+
+    ROOM_JOIN: "room-join",
     ROOM_JOINED: "room-joined",
+
+    PLAYER_LEAVE: "player-leave",
+    PLAYER_TOGGLE: "player-toggle",
+
+    LOBBY_EXIT: "lobby-exit",
     ROOM_ERROR: "room-error",
-    PLAYER_JOIN: "player-join",
+
+    PLAYER_KICK: "player-kick",
+
+    LOBBY_UPDATED: "lobby-updated",
+
 };

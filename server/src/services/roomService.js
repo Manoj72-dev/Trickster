@@ -1,45 +1,93 @@
-const rooms = require("../store/rooms");
+const { rooms, connections } = require("../store/rooms");
 const generateRoomCode = require("../utils/generateRoomCode");
+
+function createRoomObject(roomCode, hostId, hostName) {
+  return {
+    roomCode,
+    hostId,
+    phase: 'lobby',
+    createdAt: Date.now(),
+
+    settings: {
+      maxPlayers: 8,
+      minPlayers: 3,
+      hintTimer: 60,
+      category: 'Mixed',
+    },
+
+    words: {
+      real: null,
+      imposter: null,
+    },
+
+    players: [
+      createPlayer(hostId, hostName, true, false),
+    ],
+
+    round: {
+      current: 1,
+      hints: {},
+      votes: {},
+      tieOccurred: false,
+    },
+
+    timers: {
+      hintPhase: null,
+      connectionCheck: null,
+    },
+
+    result: {
+      winner: null,
+      imposterId: null,
+      imposterName: null,
+      realWord: null,
+      imposterWord: null,
+      eliminatedBy: null,
+    },
+  };
+}
+
+
+function createPlayer(id, name, isHost = false, isReady = false) {
+  return {
+    id,
+    name,
+    isHost,
+    isReady,
+    isImposter: false,
+    word: null,
+
+    isEliminated: false,
+    isConnected: true,
+
+    disconnectedAt: null,
+    eliminatedReason: null,
+
+    hint: null,
+    hasSubmittedHint: false,
+    vote: null,
+    hasVoted: false,
+  };
+}
 
 function createRoom(hostId, hostName) {
     let roomCode;
 
     do {
         roomCode = generateRoomCode();
-    } while (rooms[roomCode]);
+    } while (rooms.has(roomCode));
 
-    const room = {
-        roomCode,
-        hostId,
-        phase: "lobby",
+    const room = createRoomObject(roomCode, hostId, hostName);
+    rooms.set(roomCode, room);
+    connections.set(hostId,{roomCode, playerName: hostName});
 
-        settings: {
-            maxPlayers: 8,
-            rounds: 5,
-            timer: 60,
-            category: "Mixed",
-        },
-
-        players: [
-            {
-                id: hostId,
-                name: hostName,
-                ready: false,
-                isHost: true,
-            },
-        ],
-    };
-
-    rooms[roomCode] = room;
-
-    return room;
+    return {room};
 }
 
 function joinRoom(roomCode, playerId, playerName) {
-
     roomCode = roomCode.toUpperCase();
 
-    const room = rooms[roomCode];
+    const room = rooms.get(roomCode);
 
     if (!room) {
         return { error: "Room not found." };
@@ -53,25 +101,54 @@ function joinRoom(roomCode, playerId, playerName) {
         return { error: "Room is full." };
     }
 
-    const exists = room.players.find(
-        player => player.id === playerId
-    );
+    const nameTaken = room.players.find(p => p.name.toLowerCase() === playerName.toLowerCase());
 
-    if (exists) {
-        return { room };
-    }
+    if(nameTaken){
+        return { error: 'Name already taken iin this room.'};
+    } 
 
-    room.players.push({
-        id: playerId,
-        name: playerName,
-        ready: false,
-        isHost: false,
-    });
+    const alreadyIn = room.players.find(p => p.id === playerId);
+    if (alreadyIn) return { room };
+
+    const player = createPlayer(playerId, playerName);
+    room.players.push(player);
+    connections.set(playerId, { roomCode, playerName });
 
     return { room };
+}
+
+function removePlayer(roomCode, socketId){
+
+    const room = rooms.get(roomCode);
+    if(!room) return {error: 'Room not found.'};
+
+    const playerIndex = room.players.findIndex(p => p.id === socketId);
+    if(playerIndex === -1) return {error: 'Player not found.'};
+
+    const player = room.players[playerIndex];
+
+    room.players.splice(playerIndex, 1);
+    connections.delete(socketId);
+
+    return { room, player };
+}
+
+function togglePlayer(roomCode, socketId){
+
+    const room = rooms.get(roomCode);
+    if(!room) return {error: 'Room not found.'};
+
+    const playerIndex = room.players.findIndex(p => p.id === socketId);
+    if(playerIndex === -1) return {error: 'Player not found.'};
+
+    room.players[playerIndex].isReady = !room.players[playerIndex].isReady;
+
+    return { room, };
 }
 
 module.exports = {
     createRoom,
     joinRoom,
+    removePlayer,
+    togglePlayer,
 };

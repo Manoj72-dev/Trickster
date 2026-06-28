@@ -1,12 +1,11 @@
 import { useGame } from "../context/GameContext";
-import { getSocket } from "../sockets/socket";
 
 import { ImCross } from "react-icons/im";
 
 
 function PlayersList() {
-    const {room, socketId} = useGame()
-    console.log(room, socketId);
+    const {room, socketId, kickPlayer } = useGame();
+    if (!room || !room.players) return null;  // add this
     return(
         <div className="font-mono p-2">
             <div className="flex flex-col gap-4">
@@ -31,18 +30,19 @@ function PlayersList() {
                             <div className="flex gap-2 justify-end">
                                 <div
                                     className={`px-2 ${
-                                        player.ready
+                                        player.isReady
                                         ? " text-white"
                                         : "text-red-500 "
                                         }
                                         `
                                     }
                                 >
-                                    {player.ready ? "Ready" : "Not Ready"}
+                                    {player.isReady ? "Ready" : "Not Ready"}
                                 </div>
 
                                 {room.hostId === socketId && !player.isHost && (
-                                <button className="bg-black px-2 rounded-lg border border-white hover:bg-red-600 transition duration-300 hover:scale-105 active:scale-95 ">
+                                <button className="bg-black px-2 rounded-lg border border-white hover:bg-red-600 transition duration-300 hover:scale-105 active:scale-95 "
+                                    onClick={() => kickPlayer(room.roomCode, player.id)}>
                                     <ImCross />
                                 </button>
                                 )}

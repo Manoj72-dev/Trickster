@@ -36,7 +36,12 @@ export function GameProvider({ children }) {
     socket.on("disconnect", () => {
     setConnected(false);
     setSocketId(null);
-});
+    setRoom(null)
+    setPlayerName("")
+    setScreen('home');
+
+    });
+
     socket.on("room-created", (room) => {
       setLoading(false);
       setError(null);
@@ -58,10 +63,17 @@ export function GameProvider({ children }) {
       setError(message);
     });
 
-    socket.on("player-join", (room) =>{
-      console.log("mess");
+    socket.on("lobby-exit", () =>{
+      setScreen("home")
+      setRoom(null)
+      setPlayerName("")
+    })
+
+    socket.on("lobby-updated", ({ room, message }) => {
       setRoom(room);
+      console.log(message);
     });
+
     return () => {
       socket.off("connect");
       socket.off("connect_error");
@@ -69,7 +81,8 @@ export function GameProvider({ children }) {
       socket.off("room-created");
       socket.off("room-joined");
       socket.off("room-error");
-      socket.off("player-join")
+      socket.off("lobby-exit");
+      socket.off("lobby-updated");
     };
   }, []);
 
@@ -86,10 +99,29 @@ export function GameProvider({ children }) {
         playerName,
         setLoading,
         setError,
-        error
       });
   
+  const kickPlayer = (roomCode, playerId) => {
+    LobbyAction.kickPlayer({
+      roomCode,
+      playerId,
+      setError,
+    })
+  }
 
+  const leaveLobby = (roomCode) => {
+    LobbyAction.leaveLobby({
+      roomCode,
+      setError
+    })
+  } 
+
+  const toggleReady = (roomCode) => {
+    LobbyAction.toggle({
+      roomCode,
+      setError,
+    })
+  }
   return (
     <GameContext.Provider value={{
       room,
@@ -105,6 +137,9 @@ export function GameProvider({ children }) {
 
       createRoom,
       joinRoom,
+      kickPlayer,
+      leaveLobby,
+      toggleReady,
     }}>
       {children}
     </GameContext.Provider>
