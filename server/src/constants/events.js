@@ -16,4 +16,7 @@ module.exports = {
 
     LOBBY_UPDATED: "lobby-updated",
     ROOM_SETTING_CHANGE: "room-setting-change",
+    CHAT_SEND: "chat-send",
+    CHAT_MESSAGE: "chat-message",
+    MAKE_HOST: "make-host",
 };

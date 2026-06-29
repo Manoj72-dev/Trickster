@@ -167,6 +167,30 @@ function isRoomHost(roomCode, socketId) {
     return Boolean(room && room.hostId === socketId);
 }
 
+function changeHost(room, playerId) {
+    const player = room.players.find(p => p.id === playerId);
+
+    if (!player) {
+        return {
+            error: "Player not found.",
+        };
+    }
+
+    const currentHost = room.players.find(p => p.isHost);
+
+    if (currentHost) {
+        currentHost.isHost = false;
+    }
+
+    player.isHost = true;
+    room.hostId = player.id;
+
+    return {
+        room,
+        player,
+    };
+}
+
 module.exports = {
     createRoom,
     joinRoom,
@@ -174,4 +198,5 @@ module.exports = {
     togglePlayer,
     getRoom,
     isRoomHost,
+    changeHost,
 };

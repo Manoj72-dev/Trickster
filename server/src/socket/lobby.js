@@ -7,6 +7,7 @@ const {
     togglePlayer,
     isRoomHost,
     getRoom,
+    changeHost,
 } = require("../services/roomService");
 
 module.exports = (io, socket) => {
@@ -78,8 +79,11 @@ module.exports = (io, socket) => {
         );
 
         io.to(result.room.roomCode).emit(EVENTS.LOBBY_UPDATED, {
-            room: result.room,
-            message: `${playerName} join the lobby`
+            room: result.room
+        });
+        io.to(result.room.roomCode).emit(EVENTS.CHAT_MESSAGE, {
+            type: "system",
+            text: `${playerName} join the lobby.`,
         });
     });
 
@@ -116,8 +120,11 @@ module.exports = (io, socket) => {
         if (kickedSocket) kickedSocket.leave(result.room.roomCode);
 
         io.to(result.room.roomCode).emit(EVENTS.LOBBY_UPDATED, {
-            room: result.room,
-            message: `${result.player.name} was kicked`
+            room: result.room
+        });
+        io.to(result.room.roomCode).emit(EVENTS.CHAT_MESSAGE, {
+            type: "system",
+            text: `${result.player.name} was kicked.`,
         });
     });
 
@@ -142,8 +149,11 @@ module.exports = (io, socket) => {
         socket.emit(EVENTS.LOBBY_EXIT);
 
         io.to(room.roomCode).emit(EVENTS.LOBBY_UPDATED, {
-            room,
-            message: `${result.player.name} left the room`
+            room
+        });
+        io.to(room.roomCode).emit(EVENTS.CHAT_MESSAGE, {
+            type: "system",
+            text: `${result.player.name} left the room`,
         });
 
     })
@@ -171,10 +181,10 @@ module.exports = (io, socket) => {
         if (result.error || result.deleted) return;
 
         io.to(result.room.roomCode).emit(EVENTS.LOBBY_UPDATED, {
-            room: result.room,
-            message: `${result.player.name} disconnected`
+            room: result.room
         });
     });
+
     socket.on(EVENTS.ROOM_SETTING_CHANGE, ({ roomCode, settings }) => {
         const room = getRoom(roomCode);
         if (!room) return;
@@ -188,9 +198,59 @@ module.exports = (io, socket) => {
         room.settings = settings;
         console.log(room);
         io.to(roomCode).emit(EVENTS.LOBBY_UPDATED, {
-            room: room,
-            message:`{}`,
+            room: room
+        });
+    });
+    socket.on(EVENTS.CHAT_SEND, ({ roomCode, message }) => {
+        const room = getRoom(roomCode);
 
+        if (!room) return;
+
+        const player = room.players.find(p => p.id === socket.id);
+
+        if (!player) return;
+
+        io.to(room.roomCode).emit(EVENTS.CHAT_MESSAGE, {
+            type: "chat",
+            senderId: player.id,
+            senderName: player.name,
+            text: message,
+        });
+    });
+    socket.on(EVENTS.MAKE_HOST, ({ roomCode, playerId }) => {
+        const room = getRoom(roomCode);
+
+        if (!room) {
+            socket.emit(EVENTS.ROOM_ERROR, "Room not found.");
+            return;
+        }
+
+        // Only the current host can transfer host
+        if (!isRoomHost(roomCode, socket.id)) {
+            socket.emit(
+                EVENTS.ROOM_ERROR,
+                "Only the host can transfer host."
+            );
+            return;
+        }
+
+        const result = changeHost(room, playerId);
+
+        if (result.error) {
+            socket.emit(
+                EVENTS.ROOM_ERROR,
+                result.error
+            );
+            return;
+        }
+
+        io.to(room.roomCode).emit(EVENTS.LOBBY_UPDATED, {
+            room: result.room,
+        });
+
+        io.to(room.roomCode).emit(EVENTS.CHAT_MESSAGE, {
+            type: "system",
+            text: `${result.player.name} is now the host.`,
         });
     });
 
