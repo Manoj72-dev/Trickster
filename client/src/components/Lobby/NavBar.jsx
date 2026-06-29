@@ -1,5 +1,5 @@
 import { IoSettingsSharp } from "react-icons/io5";
-import { useGame } from "../hooks/useGame";
+import { useGame } from "../../hooks/useGame";
 import { useState } from "react";
 
 import GameSetting from "./GameSetting";
@@ -23,9 +23,9 @@ function NavBar(){
                         </span>
                     </div>
                     
-                    <div className="flex gap-4 items-center"> 
-                        <div className="bg-gray-800 font-mono px-2 py-1 flex items-center gap-2 border border-gray-500 rounded-lg">
-                            <div className="text-gray-400 text-xs font-bold leading-none flex flex-col items-center">
+                    <div className="flex gap-4 items-center text-white/80"> 
+                        <div className="bg-black font-mono px-2 py-1 flex items-center gap-2 border  rounded-lg">
+                            <div className=" text-[10px] leading-none flex flex-col items-center">
                                 <span>
                                     Room 
                                 </span>
@@ -33,11 +33,11 @@ function NavBar(){
                                     Code
                                 </span>
                             </div> 
-                            <span className="text-red-500 font-bold text-3xl leading-none">
-                                {room.roomCode}
+                            <span className="text-red-500 font-bold text-xl leading-none">
+                                {room?.roomCode}
                             </span>
                         </div>
-                        <div className=" font-mono text-white">
+                        <div className=" font-mono font-bold">
                             <button 
                                 onClick={() => setShowSettings(true)}
                                 className=" flex py-1 justify-center items-center gap-2 border rounded-lg px-2 bg-black 

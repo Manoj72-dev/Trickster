@@ -1,63 +1,77 @@
-import { getSocket } from "../sockets/socket";
-import { EVENTS } from "../constants/events";
+import { getSocket } from '../sockets/socket';
+import { EVENTS } from '../constants/events';
+import { useGameStore } from '../store/gameStore'
 
-export function createRoom({ playerName, setLoading, setError }) {
+function emit(event, payload) {
     const socket = getSocket();
 
-    setLoading(true);
-    setError(null);
+    if (!socket) {
+        useGameStore.getState().setError("Unable to connect to the server.");
+        return;
+    }
 
-    socket.emit(EVENTS.ROOM_CREATE, {
-        playerName,
-    });
+    socket.emit(event, payload);
 }
 
-export function joinRoom({
-    roomCode,
-    playerName,
-    setLoading,
-    setError,
-}) {
-    const socket = getSocket();
-
+export function createRoom(playerName) {
+    const { setLoading, clearError } = useGameStore.getState()
     setLoading(true);
-    setError(null);
-    socket.emit(EVENTS.ROOM_JOIN, {
-        roomCode,
-        playerName,
-    });
+    clearError();
+    emit(EVENTS.ROOM_CREATE, { playerName });
 }
 
-export function kickPlayer({roomCode, playerId, setError}){
-    const socket = getSocket();
-
+export function joinRoom(roomCode, playerName) {
+    const { setLoading, setError } = useGameStore.getState()
+    setLoading(true);
     setError(null);
-    socket.emit(EVENTS.PLAYER_KICK, {
+    emit(EVENTS.ROOM_JOIN, { roomCode, playerName });
+}
+
+export function kickPlayer(roomCode, playerId){
+    const { setError } = useGameStore.getState()
+    setError(null);
+    emit(EVENTS.PLAYER_KICK, {
         roomCode, playerId
     });
 }
 
-export function leaveLobby({roomCode,setError}){
-    const socket = getSocket();
-
+export function leaveLobby(roomCode){
+    const { setError } = useGameStore.getState()
     setError(null)
-    socket.emit(EVENTS.PLAYER_LEAVE,{
+    emit(EVENTS.PLAYER_LEAVE,{
         roomCode
     })
 }
 
-export function toggle({roomCode, setError}){
-    const socket = getSocket();
-
+export function toggleReady(roomCode){
+    const { setError } = useGameStore.getState()
     setError(null);
-    socket.emit(EVENTS.PLAYER_TOGGLE, {
+    emit(EVENTS.PLAYER_TOGGLE, {
         roomCode
     })
 }
-export const changeSetting = ({roomCode, settings}) => {
-    const socket = getSocket();
-  socket.emit("room-setting-change", {
+
+export function changeSetting(roomCode, settings) {
+  emit(EVENTS.ROOM_SETTING_CHANGE, {
     roomCode,
     settings,
   });
-};
+}
+
+export function sendChatMessage(message) {
+  const { room } = useGameStore.getState();
+
+  if (!room?.roomCode) return;
+
+  emit(EVENTS.CHAT_SEND, {
+    roomCode: room.roomCode,
+    message,
+  });
+}
+
+export function makeHost(roomCode, playerId) {
+  emit(EVENTS.MAKE_HOST, {
+    roomCode,
+    playerId,
+  });
+}

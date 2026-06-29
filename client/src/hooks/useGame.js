@@ -1,12 +1,15 @@
 import { useContext } from "react";
 import { GameContext } from "../context/GameContextObject";
+import { useGameStore } from "../store/gameStore";
 
 export function useGame() {
-  const context = useContext(GameContext);
+  const actions = useContext(GameContext);
 
-  if (!context) {
+  if (!actions) {
     throw new Error("useGame must be used within a GameProvider.");
   }
 
-  return context;
+  const state = useGameStore()
+
+  return { ...state, ...actions };
 }

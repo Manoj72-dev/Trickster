@@ -1,15 +1,15 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { useGame } from "../hooks/useGame";
+import { useGame } from "../../hooks/useGame";
 
 function Popup({ type, close }) {
   const {
-    createRoom,
-    joinRoom,
-    playerName,
-    setPlayerName,
     loading,
     error,
+    playerName,
+    setPlayerName,
+    createRoom,
+    joinRoom,
   } = useGame();
 
   const [roomCode, setRoomCode] = useState("");

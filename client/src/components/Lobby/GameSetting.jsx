@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { FaCaretLeft, FaCaretRight } from "react-icons/fa";
 import { CgClose } from "react-icons/cg";
 
-import { useGame } from "../hooks/useGame";
+import { useGame } from "../../hooks/useGame";
 
 function GameSetting({ close }) {
   const { room, socketId, changeSetting } = useGame();

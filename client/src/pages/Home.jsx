@@ -1,14 +1,17 @@
 import { useState } from 'react'
-import StarsCanvas from '../components/SpaceBackground/StarsCanvas'
-import Hero from '../components/Hero'
-import HowTo from '../components/HowTo'
-import Popup from '../components/Popup'
 import { FaPlus } from "react-icons/fa";
 import { FaArrowRightLong } from "react-icons/fa6";
-import { AnimatePresence } from 'framer-motion'
+
+import StarsCanvas from '../components/SpaceBackground/StarsCanvas'
+import Hero from '../components/Home/Hero'
+import HowTo from '../components/Home/HowTo'
+import Popup from '../components/Home/Popup'
+
 
 function Home(){
+
     const [popup, setPopup] = useState(null);
+
     return(
     <div className="relative w-screen h-screen">
       <StarsCanvas/>
@@ -37,15 +40,14 @@ function Home(){
            
           </div>
         </div>
-         <AnimatePresence mode="wait">
-                {popup&& (
-                    <Popup
-                        type={popup}
-                        close={() => setPopup(null)}
-                    />
-                )}
-            </AnimatePresence>
+          
         <HowTo/>
+        {popup&& (
+          <Popup
+            type={popup}
+            close={() => setPopup(null)}
+          />
+        )}
     </div>
     )
 }

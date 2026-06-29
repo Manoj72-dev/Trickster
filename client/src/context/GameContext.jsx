@@ -1,76 +1,101 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { connectSocket } from '../sockets/socket'
 import { EVENTS } from '../constants/events'
 import { GameContext } from './GameContextObject'
+import { useGameStore } from '../store/gameStore'
 
 import * as LobbyAction from '../game/lobbyActions';
 
+const gameActions = {
+  createRoom: LobbyAction.createRoom,
+  joinRoom: LobbyAction.joinRoom,
+  kickPlayer: LobbyAction.kickPlayer,
+  leaveLobby: LobbyAction.leaveLobby,
+  toggleReady: LobbyAction.toggleReady,
+  changeSetting: LobbyAction.changeSetting,
+  sendChatMessage: LobbyAction.sendChatMessage,
+  makeHost: LobbyAction.makeHost,
+};
+
 export function GameProvider({ children }) {
-  const [socketId, setSocketId] = useState(null);
-  const [connected, setConnected] = useState(false);
-
-  const [screen, setScreen]         = useState('home')
-
-  const [room, setRoom]             = useState(null)
-  const [playerName, setPlayerName] = useState('')
-  const [myWord]                    = useState(null)
-
-  const [error, setError]           = useState(null)
-  const [loading, setLoading] = useState(false);
-
   useEffect(() => {
     const socket = connectSocket()
 
-    socket.on("connect", () => {
-      setConnected(true);
-      setSocketId(socket.id);
-      setError(null);
+    const setConnectedState = (connected, socketId = null) => {
+      const { setConnected, setSocketId } = useGameStore.getState();
+      setConnected(connected);
+      setSocketId(socketId);
+    };
 
+    const resetLobby = (error = null) => {
+      const {
+        setRoom,
+        setScreen,
+        setPlayerName,
+        setError,
+        setLoading,
+        clearChatMessages,
+      } = useGameStore.getState();
+
+      setLoading(false);
+      setRoom(null);
+      setPlayerName("");
+      clearChatMessages();
+      setScreen("home");
+      setError(error);
+    };
+
+    socket.on("connect", () => {
+      const { setError } = useGameStore.getState();
+      setConnectedState(true, socket.id);
+      setError(null);
     })
 
     socket.on("connect_error", () => {
-        setConnected(false);
-        setError("Unable to connect to the server.");
+      const { setError } = useGameStore.getState();
+      setConnectedState(false);
+      setError("Unable to connect to the server.");
     });
 
     socket.on("disconnect", () => {
-    setConnected(false);
-    setSocketId(null);
-    setRoom(null)
-    setPlayerName("")
-    setScreen('home');
-
+      setConnectedState(false);
+      resetLobby("You got disconnected.");
     });
 
     socket.on(EVENTS.ROOM_CREATED, (room) => {
+      const { setLoading, setError, setRoom, setScreen, clearChatMessages } = useGameStore.getState();
       setLoading(false);
       setError(null);
-
+      clearChatMessages();
       setRoom(room);
       setScreen("lobby");
     });
 
     socket.on(EVENTS.ROOM_JOINED, (room) => {
+      const { setLoading, setError, setRoom, setScreen, clearChatMessages } = useGameStore.getState();
       setLoading(false);
       setError(null);
-
+      clearChatMessages();
       setRoom(room);
       setScreen("lobby");
     });
 
     socket.on(EVENTS.ROOM_ERROR, (message) => {
+      const { setLoading, setError } = useGameStore.getState();
       setLoading(false);
       setError(message);
     });
 
     socket.on(EVENTS.LOBBY_EXIT, () =>{
-      setScreen("home")
-      setRoom(null)
-      setPlayerName("")
+      resetLobby();
     })
 
     socket.on(EVENTS.LOBBY_UPDATED, ({ room }) => {
-      setRoom(room);
+      useGameStore.getState().setRoom(room);
+    });
+
+    socket.on(EVENTS.CHAT_MESSAGE, (message) => {
+      useGameStore.getState().addChatMessage(message);
     });
 
     return () => {
@@ -82,69 +107,13 @@ export function GameProvider({ children }) {
       socket.off(EVENTS.ROOM_ERROR);
       socket.off(EVENTS.LOBBY_EXIT);
       socket.off(EVENTS.LOBBY_UPDATED);
+      socket.off(EVENTS.CHAT_MESSAGE);
     };
+
   }, []);
 
-  const createRoom = (playerName) =>
-    LobbyAction.createRoom({
-      playerName,
-      setLoading,
-      setError,
-    });
-  
-    const joinRoom = (roomCode, playerName) => 
-      LobbyAction.joinRoom({
-        roomCode,
-        playerName,
-        setLoading,
-        setError,
-      });
-  
-  const kickPlayer = (roomCode, playerId) => {
-    LobbyAction.kickPlayer({
-      roomCode,
-      playerId,
-      setError,
-    })
-  }
-
-  const leaveLobby = (roomCode) => {
-    LobbyAction.leaveLobby({
-      roomCode,
-      setError
-    })
-  } 
-
-  const toggleReady = (roomCode) => {
-    LobbyAction.toggle({
-      roomCode,
-      setError,
-    })
-  }
-
-  const changeSetting = (roomCode, settings) => {
-    LobbyAction.changeSetting({roomCode, settings})
-  }
   return (
-    <GameContext.Provider value={{
-      room,
-      screen, 
-      connected,   
-      playerName, 
-      myWord,
-      error,  
-      loading, 
-      socketId,
-
-      setPlayerName,
-
-      createRoom,
-      joinRoom,
-      kickPlayer,
-      leaveLobby,
-      toggleReady,
-      changeSetting,
-    }}>
+    <GameContext.Provider value={gameActions}>
       {children}
     </GameContext.Provider>
   )
