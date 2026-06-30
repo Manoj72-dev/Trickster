@@ -10,21 +10,52 @@ function Popup({ type, close }) {
     setPlayerName,
     createRoom,
     joinRoom,
+    showToast,
   } = useGame();
 
   const [roomCode, setRoomCode] = useState("");
 
   const handleCreate = () => {
-    if (!playerName.trim()) return;
+      const name = playerName.trim();
 
-    createRoom(playerName);
+      if (!name) {
+          showToast("Please enter your name.", "warning");
+          return;
+      }
+
+      if (name.length < 3) {
+          showToast("Username should be at least 3 characters.", "warning");
+          return;
+      }
+
+      createRoom(name);
   };
-
+  
   const handleJoin = () => {
-    if (!playerName.trim()) return;
-    if (!roomCode.trim()) return;
+    const name = playerName.trim();
+    const code = roomCode.trim().toUpperCase();
 
-    joinRoom(roomCode.toUpperCase(), playerName);
+    if (!name) {
+        showToast("Please enter your name.", "warning");
+        return;
+    }
+
+    if (name.length < 3) {
+        showToast("Username should be at least 3 characters.", "warning");
+        return;
+    }
+
+    if (!code) {
+        showToast("Please enter a room code.", "warning");
+        return;
+    }
+
+    if (code.length !== 6) {
+        showToast("Room code must be 6 characters.", "warning");
+        return;
+    }
+
+    joinRoom(code, name);
   };
 
   return (
@@ -34,13 +65,11 @@ function Popup({ type, close }) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      {/* Background */}
       <motion.div
         className="absolute inset-0 bg-black/20 backdrop-blur-sm"
         onClick={!loading ? close : undefined}
       />
 
-      {/* Popup */}
       <motion.div
         initial={{ scale: 0.9, opacity: 0, y: 20 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -80,7 +109,7 @@ function Popup({ type, close }) {
             <input
               disabled={loading}
               value={roomCode}
-              onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
+              onChange={(e) => setRoomCode(e.target.value)}
               type="text"
               placeholder="Enter room code"
               maxLength={6}

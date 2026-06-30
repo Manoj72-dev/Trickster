@@ -225,7 +225,6 @@ module.exports = (io, socket) => {
             return;
         }
 
-        // Only the current host can transfer host
         if (!isRoomHost(roomCode, socket.id)) {
             socket.emit(
                 EVENTS.ROOM_ERROR,

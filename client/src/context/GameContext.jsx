@@ -15,6 +15,7 @@ const gameActions = {
   changeSetting: LobbyAction.changeSetting,
   sendChatMessage: LobbyAction.sendChatMessage,
   makeHost: LobbyAction.makeHost,
+  startGame: LobbyAction.startGame,
 };
 
 export function GameProvider({ children }) {
@@ -81,9 +82,9 @@ export function GameProvider({ children }) {
     });
 
     socket.on(EVENTS.ROOM_ERROR, (message) => {
-      const { setLoading, setError } = useGameStore.getState();
+      const { setLoading, showToast } = useGameStore.getState();
       setLoading(false);
-      setError(message);
+      showToast(message,"warning");
     });
 
     socket.on(EVENTS.LOBBY_EXIT, () =>{
@@ -98,6 +99,12 @@ export function GameProvider({ children }) {
       useGameStore.getState().addChatMessage(message);
     });
 
+    socket.on(EVENTS.PHASE_CHANGE, ({room})=>{
+      const { setRoom, setScreen } = useGameStore.getState();
+      setRoom(room);
+      setScreen(room.phase) 
+    })
+
     return () => {
       socket.off("connect");
       socket.off("connect_error");
@@ -108,6 +115,7 @@ export function GameProvider({ children }) {
       socket.off(EVENTS.LOBBY_EXIT);
       socket.off(EVENTS.LOBBY_UPDATED);
       socket.off(EVENTS.CHAT_MESSAGE);
+      socket.off(EVENTS.PHASE_CHANGE);
     };
 
   }, []);

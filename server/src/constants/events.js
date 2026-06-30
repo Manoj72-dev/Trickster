@@ -19,4 +19,8 @@ module.exports = {
     CHAT_SEND: "chat-send",
     CHAT_MESSAGE: "chat-message",
     MAKE_HOST: "make-host",
+    
+    GAME_START: "game-start",
+    PHASE_CHANGE: "phase-start",
+
 };

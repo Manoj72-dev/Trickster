@@ -6,20 +6,38 @@ import Chat from "../components/Chat";
 
 
 function Lobby(){
-    const { leaveLobby,toggleReady, room, socketId } = useGame()
+    const { 
+        leaveLobby,
+        toggleReady, 
+        getMe,
+        isHost, 
+        room, 
+        showToast,
+        startGame,
+    } = useGame()
     if (!room) return null;
 
-    const me = room?.players.find(p => p.id === socketId);
-    const isHost = room.players.find(player => player.id === socketId)?.isHost ?? false;
+    const me = getMe();
+    const Host = isHost();
 
-    const enoughPlayers = room.players.length >= 3;
+    const players = room.players ?? [];
+    const enoughPlayers = players.length >= 3;
+    const allReady = players.every(player => player.isReady);
 
-    const allReady = room.players.every(player => player.isReady);
+    const handleStart = () =>{
+        if(!enoughPlayers){
+            showToast("Need at least 3 players to start.", "warning");
+            return;
+        }
+        if(!allReady){
+            showToast("All players are not ready", "warning");
+            return;
+        }
+        startGame(room.roomCode);
+    }
 
-    const canStartGame = isHost && enoughPlayers && allReady;
     return(
         <div>
-            <StarsCanvas/>
             <NavBar/>
             <div className="p-3 grid gap-4 grid-cols-2 max-[630px]:grid-cols-1 min-h-[580px] ">
                 <PlayersList/>
@@ -46,10 +64,11 @@ function Lobby(){
                     </div>
                     <div className="mr-2">
                         <button
-                            disabled={!canStartGame}
+                            onClick={() => {handleStart()}}
+                            disabled={!Host}
                             className={`min-w-[130px] rounded-xl p-2 font-bold text-xl transition duration-300
                             ${
-                                canStartGame
+                                Host
                                 ? "bg-red-500 hover:scale-110 active:scale-95"
                                 : "bg-red-500/40 opacity-50 cursor-not-allowed"
                             }`}

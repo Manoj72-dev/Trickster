@@ -75,3 +75,9 @@ export function makeHost(roomCode, playerId) {
     playerId,
   });
 }
+
+export function startGame(roomCode){
+    emit(EVENTS.GAME_START,{
+        roomCode,
+    });
+}

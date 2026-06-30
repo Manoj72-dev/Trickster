@@ -14,7 +14,6 @@ function Home(){
 
     return(
     <div className="relative w-screen h-screen">
-      <StarsCanvas/>
         <Hero/>
         
         <div className='flex flex-col font-mono'>

@@ -13,7 +13,16 @@ export const useGameStore = create((set, get) => ({
 
     error: null,
     loading: false,
+    toast: null,
 
+    showToast: (message, type = "error") => {
+        set({ toast: { message, type } });
+
+        setTimeout(() => {
+            set({ toast: null });
+        }, 3000);
+    },
+    
     setConnected:   (connected)     => set({connected}),
     setSocketId:    (socketId)      => set({socketId}),
     setRoom:        (room)          => set({room}),
@@ -31,7 +40,7 @@ export const useGameStore = create((set, get) => ({
 
     getMe: () => {
         const { room, socketId } = get()
-        return room?.players.find(p => p.id === socketId) ?? null
+        return room?.players?.find(p => p.id === socketId) ?? null
     },
     isHost: () => {
         const { room, socketId } = get()
