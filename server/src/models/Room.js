@@ -1,8 +1,10 @@
+const { createPlayerObject, getPublicPlayerObject } = require('./Player')
 
 function createRoomObject(roomCode, hostId, hostName) {
   return {
     roomCode,
     hostId,
+    imposterId: null,
     phase: 'lobby',
     createdAt: Date.now(),
 
@@ -17,9 +19,8 @@ function createRoomObject(roomCode, hostId, hostName) {
       imposter: null,
     },
 
-    players: [
-      createPlayer(hostId, hostName, true),
-    ],
+    players: new Map([[hostId, createPlayerObject(hostId, hostName, true, false)]]),
+
 
     round: {
       current: 1,
@@ -43,4 +44,25 @@ function createRoomObject(roomCode, hostId, hostName) {
     },
   };
 }
+
+function getPublicRoomObject(room){
+    return {
+        roomCode: room.roomCode, 
+        hostId: room.hostId,
+        phase: room.phase,
+        settings: room.settings,
+        players:[...room.players.values()].map(getPublicPlayerObject),
+
+        round: {
+            current: room.round.current,
+            hints: room.round.hints,
+        },
+
+        result: room.result,
+    };
+}
+
+module.exports = { createRoomObject, getPublicRoomObject}
+
+
 

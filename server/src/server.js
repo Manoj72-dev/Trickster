@@ -5,7 +5,7 @@ const rateLimiter = require('./middleware/rateLimiter');
 
 const app = require("./app");
 
-const registerSocketHandlers = require("./socket/registerHandlers")
+const registerSocketHandlers = require("./sockets/index")
 
 const server = http.createServer(app);
 
