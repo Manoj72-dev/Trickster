@@ -1,18 +1,17 @@
 import { useState, useEffect, useRef } from "react";
 import { GrSend } from "react-icons/gr";
 import { PiChatsCircleFill } from "react-icons/pi";
-
-import { useGame } from "../hooks/useGame";
+import { useGameState } from "../hooks/useGameState";
+import { useGameActions } from "../hooks/useGameActions";
 
 function Chat() {
-  const {
-    socketId,
-    sendChatMessage,
-    chatMessages,
-  } = useGame();
-
+  const chatMessages = useGameState(state => state.messages)
+  const socketId = useGameState(state => state.socketId)
+  
   const [input, setInput] = useState("");
   const bottomRef = useRef(null);
+
+  const { sendChatMessage } = useGameActions();
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({

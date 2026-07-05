@@ -1,129 +1,164 @@
-import { motion } from "framer-motion";
-import { useState } from "react";
-import { useGame } from "../../hooks/useGame";
-
+import { useState, useEffect, useRef } from "react";
+import { useGameState } from "../../hooks/useGameState";
+import {  useGameActions } from '../../hooks/useGameActions'
 function Popup({ type, close }) {
-  const {
-    loading,
-    error,
-    playerName,
-    setPlayerName,
-    createRoom,
-    joinRoom,
-    showToast,
-  } = useGame();
+  const [roomCode, setRoomCode] = useState('');
 
-  const [roomCode, setRoomCode] = useState("");
+  const nameInputRef = useRef(null);
+  const codeInputRef = useRef(null);
+  const loading = useGameState(state => state.loading);
+  const playerName = useGameState(state => state.playerName);
+
+  const setPlayerName = useGameState(state => state.setPlayerName);
+  const setError = useGameState(state => state.setError);
+  const setScreen = useGameState(state => state.setScreen);
+
+  const { createRoom, joinRoom} = useGameActions();
+  const handleClose = () => {
+    setError("");
+    setPlayerName("");
+    setRoomCode("");
+    close();
+  };
+
+  useEffect(() => {
+    nameInputRef.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape" && !loading) {
+        handleClose();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [loading, handleClose]);
+
+
 
   const handleCreate = () => {
-      const name = playerName.trim();
-
-      if (!name) {
-          showToast("Please enter your name.", "warning");
-          return;
-      }
-
-      if (name.length < 3) {
-          showToast("Username should be at least 3 characters.", "warning");
-          return;
-      }
-
-      createRoom(name);
-  };
-  
-  const handleJoin = () => {
     const name = playerName.trim();
-    const code = roomCode.trim().toUpperCase();
 
     if (!name) {
-        showToast("Please enter your name.", "warning");
-        return;
+      alert("Player name is required.");
+      nameInputRef.current?.focus();
+      return;
     }
 
     if (name.length < 3) {
-        showToast("Username should be at least 3 characters.", "warning");
-        return;
+      alert("Player name must be at least 3 characters.");
+      nameInputRef.current?.focus();
+      return;
+    }
+
+    if (name.length > 12) {
+      alert("Player name cannot be longer than 12 characters.");
+      nameInputRef.current?.focus();
+      return;
+    }
+
+    createRoom(name);
+  };
+
+  const handleJoin = () => {
+    const name = playerName.trim()
+    const code = roomCode.trim().toUpperCase();
+
+    if (!name) {
+      alert('playername is requried. ');
+      nameInputRef.current?.focus();
+
+      return;
+    }
+
+    if (name.length < 3) {
+      alert("Player name must be at least 3 characters.");
+      nameInputRef.current?.focus();
+      return;
+    }
+
+    if (name.length > 12) {
+      alert("Player name cannot be longer than 12 characters.");
+      nameInputRef.current?.focus();
+      return;
     }
 
     if (!code) {
-        showToast("Please enter a room code.", "warning");
-        return;
+      alert("Room code is required.");
+      codeInputRef.current?.focus();
+      return;
     }
 
     if (code.length !== 6) {
-        showToast("Room code must be 6 characters.", "warning");
-        return;
+      alert("Room code must be exactly 6 characters.");
+      codeInputRef.current?.focus();
+      return;
     }
-
     joinRoom(code, name);
-  };
+  }
 
   return (
-    <motion.div
-      className="fixed inset-0 z-50 flex items-center justify-center"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-    >
-      <motion.div
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div
         className="absolute inset-0 bg-black/20 backdrop-blur-sm"
-        onClick={!loading ? close : undefined}
+        onClick={!loading ? handleClose : undefined}
       />
 
-      <motion.div
-        initial={{ scale: 0.9, opacity: 0, y: 20 }}
-        animate={{ scale: 1, opacity: 1, y: 0 }}
-        exit={{ scale: 0.9, opacity: 0, y: 20 }}
-        transition={{ duration: 0.25, ease: "easeOut" }}
-        className="relative z-10 w-[380px] rounded-2xl border border-gray-700 bg-gray-900/70 backdrop-blur-xl p-6 text-white font-mono"
+      <div
+        className="relative z-10 w-[380px] rounded-2xl border border-gray-700 bg-gray-700/50 backdrop-blur-xl p-6 text-white/80 font-mono"
       >
         <h2 className="mb-6 text-2xl font-bold">
           {type === "create" ? "Create Room" : "Join Room"}
         </h2>
 
-        {error && (
-          <p className="mb-4 text-sm text-red-400">
-            {error}
-          </p>
-        )}
-
-        {/* Name */}
         <div className="mb-4 flex flex-col gap-2">
           <label className="text-gray-300">Name</label>
 
           <input
+            ref={nameInputRef}
             disabled={loading}
             value={playerName}
-            onChange={(e) => setPlayerName(e.target.value)}
+            onChange={(e) => {
+              setPlayerName(e.target.value)
+              setError('')
+            }
+            }
             type="text"
+            maxLength={12}
             placeholder="Enter your name"
-            className="rounded-lg border border-gray-700 bg-gray-800/60 p-2 outline-none focus:border-red-500 disabled:opacity-60"
+            className="rounded-lg border border-gray-700 bg-gray-700/40 p-2 outline-none focus:border-white/80 disabled:opacity-60"
           />
         </div>
 
-        {/* Room Code */}
         {type === "join" && (
           <div className="mb-6 flex flex-col gap-2">
             <label className="text-gray-300">Room Code</label>
 
             <input
+              ref={codeInputRef}
               disabled={loading}
               value={roomCode}
-              onChange={(e) => setRoomCode(e.target.value)}
+              onChange={(e) => {
+                setRoomCode(e.target.value.toUpperCase().replace(/\s/g, ''))
+                setError('')
+              }
+              }
               type="text"
               placeholder="Enter room code"
               maxLength={6}
-              className="rounded-lg border border-gray-700 bg-gray-800/60 p-2 uppercase tracking-widest outline-none focus:border-red-500 disabled:opacity-60"
+              className="rounded-lg border border-gray-700 bg-gray-700/40 p-2  outline-none focus:border-white/80 disabled:opacity-60"
             />
           </div>
         )}
 
-        {/* Buttons */}
         <div className="mt-6 flex justify-end gap-3">
           <button
             disabled={loading}
-            onClick={close}
-            className="rounded-lg border border-gray-600 px-4 py-2 transition hover:bg-gray-800 hover:scale-105 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+            onClick={handleClose}
+            className="rounded-lg border border-gray-600 px-4 py-2 transition hover:bg-gray-700/40 hover:scale-105 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
           >
             Cancel
           </button>
@@ -138,12 +173,12 @@ function Popup({ type, close }) {
                 ? "Creating..."
                 : "Joining..."
               : type === "create"
-              ? "Create"
-              : "Join"}
+                ? "Create"
+                : "Join"}
           </button>
         </div>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 }
 

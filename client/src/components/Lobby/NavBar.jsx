@@ -1,11 +1,13 @@
 import { IoSettingsSharp } from "react-icons/io5";
-import { useGame } from "../../hooks/useGame";
 import { useState } from "react";
+import { useGameState } from "../../hooks/useGameState";
 
 import GameSetting from "./GameSetting";
 function NavBar(){
+
     const [showSettings, setShowSettings] = useState(false);
-    const {room} = useGame()
+    const roomCode = useGameState(state => state.room?.roomCode)
+
     return(
         <div>
             <nav>
@@ -34,7 +36,7 @@ function NavBar(){
                                 </span>
                             </div> 
                             <span className="text-red-500 font-bold text-xl leading-none">
-                                {room?.roomCode}
+                                {roomCode}
                             </span>
                         </div>
                         <div className=" font-mono font-bold">

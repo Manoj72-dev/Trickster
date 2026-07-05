@@ -1,11 +1,18 @@
-import { useGame } from "../../hooks/useGame";
 import { useState, useRef, useEffect } from "react";
 import { LuCrown, LuUserX, LuEllipsisVertical } from "react-icons/lu";
-
+import { useGameState } from "../../hooks/useGameState";
+import { useGameActions } from '../../hooks/useGameActions'
 function PlayersList() {
-  const { room, socketId, kickPlayer, makeHost } = useGame();
   const [openMenu, setOpenMenu] = useState(null);
   const menuRef = useRef(null);
+  
+  const players = useGameState(state => state.room?.players ?? []);
+  const maxPlayers = useGameState(state => state.room?.settings?.maxPlayers);
+  const roomCode = useGameState(state => state.room?.roomCode);
+  const hostId = useGameState(state => state.room?.hostId);
+  const socketId = useGameState(state => state.socketId);
+
+  const {makeHost, kickPlayer} = useGameActions()
 
   useEffect(() => {
     const handler = (e) => {
@@ -16,23 +23,21 @@ function PlayersList() {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  if (!room || !room.players) return null;
 
-  const isHostViewing = room.hostId === socketId;
+  const isHostViewing = hostId === socketId;
 
   return (
     <div className="font-mono p-2 flex flex-col gap-4">
       <span className=" font-bold text-white/80 ">
-        Players ({room.players.length}/{room.settings.maxPlayers})
+        Players ({players.length}/{maxPlayers})
       </span>
 
       <div className="flex flex-col gap-2" ref={menuRef}>
-        {room.players.map((player) => {
+        {players.map((player) => {
           const isMe = player.id === socketId;
           const isHost = player.isHost;
           const canManage = isHostViewing && !isHost;
           const menuOpen = openMenu === player.id;
-
           return (
             <div
               key={player.id}
@@ -52,7 +57,7 @@ function PlayersList() {
                       : "bg-white/8 text-white/80",
                   ].join(" ")}
                 >
-                  {player.name[0].toUpperCase()}
+                  {player.name?.[0].toUpperCase()}
                 </div>
 
                 <div className="flex items-center gap-2 min-w-0">
@@ -67,7 +72,6 @@ function PlayersList() {
                 </div>
               </div>
 
-              {/* Right */}
               <div className="flex items-center gap-2 shrink-0">
                 <div className={["w-[7px] h-[7px] rounded-full", player.isReady ? "bg-green-400" : "bg-white/15"].join(" ")} />
                 <span className={["text-[12px]", player.isReady ? "text-green-400" : "text-white/30"].join(" ")}>
@@ -87,14 +91,14 @@ function PlayersList() {
                     {menuOpen && (
                       <div className="absolute right-0 top-[30px] z-20 bg-zinc-950/10 border border-white/12 rounded-[10px] overflow-hidden min-w-[140px] backdrop-blur-sm">
                         <button
-                          onClick={() => {makeHost(room.roomCode, player.id); setOpenMenu(null); }}
+                          onClick={() => {makeHost(roomCode, player.id); setOpenMenu(null); }}
                           className="flex items-center gap-2.5 w-full px-3.5 py-2.5 text-[13px] text-white/80 hover:bg-white/10 transition-colors text-left"
                         >
                           <LuCrown size={14} />
                           Make host
                         </button>
                         <button
-                          onClick={() => { kickPlayer(room.roomCode, player.id); setOpenMenu(null); }}
+                          onClick={() => { kickPlayer(roomCode, player.id); setOpenMenu(null); }}
                           className="flex items-center gap-2.5 w-full px-3.5 py-2.5 text-[13px] text-red-400 hover:bg-white/7 transition-colors text-left"
                         >
                           <LuUserX size={14} />

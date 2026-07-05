@@ -45,24 +45,23 @@ function createRoomObject(roomCode, hostId, hostName) {
   };
 }
 
-function getPublicRoomObject(room){
-    return {
-        roomCode: room.roomCode, 
-        hostId: room.hostId,
-        phase: room.phase,
-        settings: room.settings,
-        players:[...room.players.values()].map(getPublicPlayerObject),
+function getPublicRoomObject(room) {
+  return {
+    roomCode: room.roomCode,
+    hostId: room.hostId,
+    phase: room.phase,
+    settings: room.settings,
+    players: [...room.players.values()].map(getPublicPlayerObject),
 
-        round: {
-            current: room.round.current,
-            hints: room.round.hints,
-        },
-
-        result: room.result,
-    };
+    round: {
+      current: room.round.current,
+      hints: room.round.hints,
+    },
+    result: room.result,
+  };
 }
 
-module.exports = { createRoomObject, getPublicRoomObject}
+module.exports = { createRoomObject, getPublicRoomObject }
 
 
 

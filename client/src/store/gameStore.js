@@ -1,50 +1,32 @@
-import { create } from 'zustand'
+import { create } from 'zustand';
 
-export const useGameStore = create((set, get) => ({
-    socketId: null,
+export const useGameStore = create((set) => ({
+
     connected: false,
+    socketId: null,
 
     screen: 'home',
+    loading: false,
+    error: '',
+
+    playerName: '',
 
     room: null,
-    playerName: '',
-    myWord: null,
-    chatMessages: [],
-
-    error: null,
-    loading: false,
-    toast: null,
-
-    showToast: (message, type = "error") => {
-        set({ toast: { message, type } });
-
-        setTimeout(() => {
-            set({ toast: null });
-        }, 3000);
-    },
     
-    setConnected:   (connected)     => set({connected}),
-    setSocketId:    (socketId)      => set({socketId}),
-    setRoom:        (room)          => set({room}),
-    setScreen:      (screen)        => set({screen}),
-    setPlayerName:  (playerName)    => set({playerName}),
-    setMyWord:      (myWord)        => set({myWord}),
-    setChatMessages:(chatMessages)  => set({chatMessages}),
-    addChatMessage: (message)       => set((state) => ({
-        chatMessages: [...state.chatMessages, message],
-    })),
-    clearChatMessages: ()           => set({chatMessages: []}),
-    setError:       (error)         => set({ error }),
-    setLoading:     (loading)       => set({ loading }),
-    clearError:     ()              => set({ error: null }),
+    messages: [],
 
-    getMe: () => {
-        const { room, socketId } = get()
-        return room?.players?.find(p => p.id === socketId) ?? null
-    },
-    isHost: () => {
-        const { room, socketId } = get()
-        return room?.hostId === socketId
-    },
+    setConnected: (connected) => set({ connected }),
+    setSocketId: (socketId) => set({ socketId }),
 
-}))
+    setScreen: (screen) => set({ screen }),
+    setLoading: (loading) => set({ loading }),
+    setError: (error) => set({ error }),
+
+    setPlayerName: (playerName) => set({ playerName }),
+
+    setRoom: (room) => set({ room }),
+    addChatMessage: (message) =>
+        set((state) => ({
+            messages: [...state.messages, message],
+        })),
+}));

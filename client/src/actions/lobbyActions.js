@@ -16,7 +16,6 @@ function emit(event, payload) {
 export function createRoom(playerName) {
     const { setLoading, clearError } = useGameStore.getState()
     setLoading(true);
-    clearError();
     emit(EVENTS.ROOM_CREATE, { playerName });
 }
 
@@ -38,7 +37,7 @@ export function kickPlayer(roomCode, playerId){
 export function leaveLobby(roomCode){
     const { setError } = useGameStore.getState()
     setError(null)
-    emit(EVENTS.PLAYER_LEAVE,{
+    emit(EVENTS.ROOM_LEAVE,{
         roomCode
     })
 }
@@ -46,7 +45,7 @@ export function leaveLobby(roomCode){
 export function toggleReady(roomCode){
     const { setError } = useGameStore.getState()
     setError(null);
-    emit(EVENTS.PLAYER_TOGGLE, {
+    emit(EVENTS.PLAYER_READY, {
         roomCode
     })
 }

@@ -12,9 +12,11 @@ module.exports = (io, socket) => {
         const { room } = createRoom(socket.id, playerName.trim());
         socket.join(room.roomCode);
         socket.emit('room:created', getPublicRoomObject(room));
+
     });
 
     socket.on('room:join', ({ roomCode, playerName }) => {
+                console.log('yes');
         if (!playerName?.trim()) {
             socket.emit('room:error', 'Player name is required.');
             return;
@@ -37,7 +39,6 @@ module.exports = (io, socket) => {
         socket.join(room.roomCode);
         socket.emit('room:joined', getPublicRoomObject(room));
         io.to(room.roomCode).emit('room:updated', getPublicRoomObject(room));
-
 
     });
 

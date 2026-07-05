@@ -3,19 +3,30 @@ import { useEffect, useState } from "react";
 import { FaCaretLeft, FaCaretRight } from "react-icons/fa";
 import { CgClose } from "react-icons/cg";
 
-import { useGame } from "../../hooks/useGame";
+import { useGameActions } from "../../hooks/useGameActions";
+import { useGameState } from "../../hooks/useGameState";
 
 function GameSetting({ close }) {
-  const { room, socketId, changeSetting } = useGame();
 
-  const [settings, setSettings] = useState(room.settings);
+  const settingsFromStore = useGameState(state => state.room?.settings);
 
-  useEffect(() => {
-    setSettings(room.settings);
-  }, [room]);
+  const players = useGameState(state => state.room?.players ?? []);
+  const roomCode = useGameState(state => state.room?.roomCode);
+  const socketId = useGameState(state => state.socketId);
 
-  const isHost =
-    room.players.find((player) => player.id === socketId)?.isHost || false;
+  const [settings, setSettings] = useState(settingsFromStore);
+
+  const {changeSetting} = useGameActions();
+
+  useEffect(()=>{
+    if(settingsFromStore){
+      setSettings(settingsFromStore);
+    }
+  },[settingsFromStore]);
+
+  if (!settings) return null;
+
+  const isHost = players.find((player) => player.id === socketId)?.isHost || false;
 
   const formatTime = (seconds) => {
     const min = Math.floor(seconds / 60);
@@ -56,7 +67,7 @@ function GameSetting({ close }) {
 
   const handleClose = () => {
     if (isHost) {
-      changeSetting(room.roomCode, settings);
+      changeSetting(roomCode, settings);
     }
 
     close();
