@@ -5,7 +5,6 @@ import { EVENTS } from './socketEvents'
 export function registerSocketHandlers() {
     const socket = getSocket();
     const store = useGameStore.getState();
-    console.log('register')
     socket.off(EVENTS.ROOM_CREATED);
     socket.off(EVENTS.ROOM_JOINED);
     socket.off(EVENTS.ROOM_ERROR);
@@ -31,11 +30,12 @@ export function registerSocketHandlers() {
     })
 
     socket.on(EVENTS.ROOM_ERROR, (error) =>{
-        console.log('error');
+        console.log(error);
     })
 
     socket.on(EVENTS.ROOM_UPDATED, (room)=>{
         store.setRoom(room);
+        store.setScreen(room.phase)
     })
 
     socket.on(EVENTS.ROOM_LEFT, ()=>{
@@ -50,5 +50,10 @@ export function registerSocketHandlers() {
     })
     socket.on(EVENTS.CHAT_MESSAGE,(mes) =>{
         store.addChatMessage(mes);
+    })
+
+    socket.on(EVENTS.GAME_WORD,({word, role})=> {
+        store.setPlayerRole({word, role});
+        store.setScreen('starting');
     })
 }

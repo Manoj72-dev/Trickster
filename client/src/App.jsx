@@ -10,6 +10,10 @@ import AnimatedContainer from './AnimatedContainer/AnimatedContainer'
 
 import Home from './pages/Home'
 import Lobby from './pages/Lobby'
+import Starting from './pages/Starting'
+import HintPhase from './pages/HintPhase'
+
+import { presets } from './AnimatedContainer/presets'
 
 function GameScreen() {
   const screen = useGameState(state => state.screen)
@@ -17,11 +21,19 @@ function GameScreen() {
   const screens = {
     home: {
       component: Home,
-      preset: "slideDown",
+      preset: "fade",
     },
     lobby: {
       component: Lobby,
-      preset: "slideUp",
+      preset: "fade",
+    },
+    starting: {
+      component: Starting,
+      presets: 'fade',
+    },
+    hint: {
+      component: HintPhase,
+      presets: 'fade',
     },
   };
 

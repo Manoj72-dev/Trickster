@@ -16,7 +16,6 @@ module.exports = (io, socket) => {
     });
 
     socket.on('room:join', ({ roomCode, playerName }) => {
-                console.log('yes');
         if (!playerName?.trim()) {
             socket.emit('room:error', 'Player name is required.');
             return;

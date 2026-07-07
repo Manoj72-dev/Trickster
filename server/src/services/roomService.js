@@ -4,9 +4,7 @@ const { createRoomObject } = require('../models/Room');
 const { createPlayerObject } = require('../models/Player');
 
 function getRoom(roomCode) {
-    const room = rooms.get(roomCode.toUpperCase());
-    if (!room) return null;
-    return { room };
+    return rooms.get(roomCode.toUpperCase()) || null;
 }
 
 function getPlayer(roomCode, socketId) {

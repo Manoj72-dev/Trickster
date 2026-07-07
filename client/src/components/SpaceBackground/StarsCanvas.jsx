@@ -20,8 +20,8 @@ function StarsCanvas(){
                 stars.push({
                     x: Math.random() * canvas.width,
                     y: Math.random() * canvas.height,
-                    radius: Math.random() * 1 + 1,
-                    speed: Math.random() * 0.5 + 0.2,
+                    radius: Math.random() * 1 + 0.5,
+                    speed: Math.random() * 0.1 + 0.2,
                 });
             }
         };

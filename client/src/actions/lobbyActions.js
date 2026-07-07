@@ -1,5 +1,5 @@
 import { getSocket } from '../sockets/socket';
-import { EVENTS } from '../constants/events';
+import { EVENTS } from '../sockets/socketEvents';
 import { useGameStore } from '../store/gameStore'
 
 function emit(event, payload) {

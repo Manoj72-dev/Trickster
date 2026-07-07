@@ -11,9 +11,7 @@ function createPlayerObject(id, name, isHost = false, isReady = false) {
     disconnectedAt: null,
     eliminatedReason: null,
 
-    hint: null,
     hasSubmittedHint: false,
-    vote: null,
     hasVoted: false,
   };
 }

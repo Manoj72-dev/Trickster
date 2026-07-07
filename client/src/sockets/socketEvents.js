@@ -16,4 +16,11 @@ export const EVENTS = {
 
     CHAT_SEND: 'chat:send',
     CHAT_MESSAGE: 'chat:message',
+    GAME_START: 'game:start',
+    START_COMPLETED: 'start:completed',
+    
+    GAME_WORD: 'game:word',
+
+    PHASE_HINT: 'phase:hint',
+    HINT_SUBMIT: 'hint:submit',
 }

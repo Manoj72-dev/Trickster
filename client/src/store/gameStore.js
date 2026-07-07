@@ -15,6 +15,9 @@ export const useGameStore = create((set) => ({
     
     messages: [],
 
+    myWord: '',
+    isImposter: false,
+
     setConnected: (connected) => set({ connected }),
     setSocketId: (socketId) => set({ socketId }),
 
@@ -29,4 +32,10 @@ export const useGameStore = create((set) => ({
         set((state) => ({
             messages: [...state.messages, message],
         })),
+
+    setPlayerRole: ({ word, role }) =>
+        set({
+            myWord: word,
+            isImposter: role === "imposter",
+        }),
 }));

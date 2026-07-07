@@ -1,3 +1,4 @@
+const { values } = require('../store/words');
 const { createPlayerObject, getPublicPlayerObject } = require('./Player')
 
 function createRoomObject(roomCode, hostId, hostName) {
@@ -6,7 +7,6 @@ function createRoomObject(roomCode, hostId, hostName) {
     hostId,
     imposterId: null,
     phase: 'lobby',
-    createdAt: Date.now(),
 
     settings: {
       maxPlayers: 8,
@@ -21,27 +21,22 @@ function createRoomObject(roomCode, hostId, hostName) {
 
     players: new Map([[hostId, createPlayerObject(hostId, hostName, true, false)]]),
 
+    phaseCompleted: new Set(),
 
     round: {
       current: 1,
-      hints: {},
-      votes: {},
+      hints: new Map(),
+      votes: new Map(),
       tieOccurred: false,
     },
 
     timers: {
-      hintPhase: null,
+      current: null,
+      endTime: null,
       connectionCheck: null,
     },
 
-    result: {
-      winner: null,
-      imposterId: null,
-      imposterName: null,
-      realWord: null,
-      imposterWord: null,
-      eliminatedBy: null,
-    },
+    result: null,
   };
 }
 
@@ -55,8 +50,9 @@ function getPublicRoomObject(room) {
 
     round: {
       current: room.round.current,
-      hints: room.round.hints,
+      hints: [...room.round.hints.values()],
     },
+    endTime: room.timers.endTime,
     result: room.result,
   };
 }
