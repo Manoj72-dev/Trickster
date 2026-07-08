@@ -1,6 +1,7 @@
 const { createRoom, joinRoom, removePlayer, getRoom, makeHost, togglePlayer, changeSettings } = require('../services/roomService');
 const { getPublicRoomObject } = require('../models/Room');
-
+const { validateSettingsChange, validateCanBe } = require('../managers/validationManager');
+const { changeRoomSettings } = require('../managers/roomManager')
 module.exports = (io, socket) => {
 
     socket.on('room:create', ({ playerName }) => {
@@ -65,49 +66,22 @@ module.exports = (io, socket) => {
     });
 
     socket.on('room:settings', ({ roomCode, settings }) => {
-        if (!roomCode?.trim()) {
-            socket.emit('room:error', 'Room code is required.');
+        
+        const result = validateSettingsChange(socket, roomCode, settings);
+
+        if(!result.success){
+            console.log(result.message);
             return;
         }
 
-        const roomResult = getRoom(roomCode.trim());
-        if (!roomResult) {
-            socket.emit('room:error', 'Room not found.');
-            return;
-        }
-        if (roomResult.room.hostId !== socket.id) {
-            socket.emit('room:error', 'Only the host can change settings.');
-            return;
-        }
-
-        const { room, error } = changeSettings(roomCode.trim(), settings);
-        if (error) {
-            socket.emit('room:error', error);
-            return;
-        }
-
-        io.to(room.roomCode).emit('room:updated', getPublicRoomObject(room));
+        changeRoomSettings(io, result.room, settings);
     });
 
-    socket.on('player:kick', ({ roomCode, playerId }) => {
-        if (!roomCode?.trim()) {
-            socket.emit('room:error', 'Room code is required.');
-            return;
-        }
+    socket.on('kick:player', ({ roomCode, playerId }) => {
+        const result = validateCanBe(socket, roomCode, playerId);
 
-        const roomResult = getRoom(roomCode.trim());
-        if (!roomResult) {
-            socket.emit('room:error', 'Room not found.');
-            return;
-        }
-
-        if (roomResult.room.hostId !== socket.id) {
-            socket.emit('room:error', 'Only the host can kick players.');
-            return;
-        }
-
-        if (playerId === socket.id) {
-            socket.emit('room:error', 'Host cannot kick themselves.');
+        if(!result.success){
+            console.log(result.message);
             return;
         }
 
@@ -131,19 +105,11 @@ module.exports = (io, socket) => {
         });
     });
 
-    socket.on('player:host', ({ roomCode, playerId }) => {
-        if (!roomCode?.trim()) {
-            socket.emit('room:error', 'Room code is required.');
-            return;
-        }
+    socket.on('room:host', ({ roomCode, playerId }) => {
+        const result = validateCanBe(socket, roomCode, playerId);
 
-        const roomResult = getRoom(roomCode.trim());
-        if (!roomResult) {
-            socket.emit('room:error', 'Room not found.');
-            return;
-        }
-        if (roomResult.room.hostId !== socket.id) {
-            socket.emit('room:error', 'Only the host can transfer host.');
+        if(!result.success){
+            console.log(result.message);
             return;
         }
 

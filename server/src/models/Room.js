@@ -7,7 +7,6 @@ function createRoomObject(roomCode, hostId, hostName) {
     hostId,
     imposterId: null,
     phase: 'lobby',
-
     settings: {
       maxPlayers: 8,
       hintTime: 60,

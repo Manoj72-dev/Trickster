@@ -100,33 +100,11 @@ function togglePlayer(roomCode, socketId) {
     return { room, player };
 }
 
-function changeSettings(roomCode, settings) {
-    
-    const result = getRoom(roomCode);
-    if (!result) return { error: 'Room not found.' };
-    const { room } = result;
-
-    if (room.phase !== 'lobby') return { error: 'Cannot change settings after game starts.' };
-
-    const { maxPlayers, hintTime, voteTime } = settings;
-
-    if (maxPlayers !== undefined) {
-        if (maxPlayers < 3 || maxPlayers > 8) return { error: 'Max players must be between 3 and 8.' };
-        if (maxPlayers < room.players.size) return { error: 'Cannot set max players below current player count.' };
-        room.settings.maxPlayers = maxPlayers;
-    }
-
-    if (hintTime !== undefined) {
-        if (hintTime < 15 || hintTime > 120) return { error: 'Hint time must be between 15 and 120 seconds.' };
-        room.settings.hintTime = hintTime;
-    }
-
-    if (voteTime !== undefined) {
-        if (voteTime < 15 || voteTime > 120) return { error: 'Vote time must be between 15 and 120 seconds.' };
-        room.settings.voteTime = voteTime;
-    }
-
-    return { room };
+function changeSettings( room, settings) {
+    const {maxPlayers, hintTime, voteTime} = settings;
+    room.settings.maxPlayers = maxPlayers;
+    room.settings.hintTime = hintTime;
+    room.settings.voteTime = voteTime;
 }
 
 module.exports = { createRoom, joinRoom, removePlayer, getRoom, getPlayer, makeHost, togglePlayer, changeSettings };
