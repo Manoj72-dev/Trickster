@@ -38,4 +38,16 @@ export const useGameStore = create((set) => ({
             myWord: word,
             isImposter: role === "imposter",
         }),
+    
+    getMe: () => {
+        const state = useGameStore.getState();
+
+        if (!state.room || !state.socketId) return null;
+
+        return (
+            state.room.players.find(
+                (player) => player.id === state.socketId
+            ) || null
+        );
+    },
 }));

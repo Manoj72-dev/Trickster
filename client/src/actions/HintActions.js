@@ -30,3 +30,10 @@ export function submitHint(roomCode, hint){
     setError(null);
     emit(EVENTS.HINT_SUBMIT, {roomCode, hint})
 }
+
+export function submitVote(roomCode, playerId){
+    const { setLoading, setError } = useGameStore.getState()
+    setLoading(true);
+    setError(null);
+    emit(EVENTS.VOTE_SUBMIT, {roomCode, playerId})
+}

@@ -1,14 +1,25 @@
 const { rooms, connection } = require('../store/rooms')
 const { success, fail } = require('../utils/validationResult')
 
+
+function validateName(playerName){
+    name = playerName.trim();
+    if(!playerName || name.length <3 || name.length >12){
+        return fail('Name must be between 3 and 12 characters long.')
+    }
+    return success();
+}
+
 function validateRoom(roomCode){
-    if(!roomCode?.trim()){
+    const code = roomCode.toUpperCase();
+    if(!code?.trim()){
         return fail('RoomCode is requried');
     }
-    if(roomCode.length < 6 || roomCode.length > 6){
+    if(code.length < 6 || codeode.length > 6){
         return fail('RoomCode should be of 6 charaters');
     }
-    const room = rooms.get(roomCode);
+
+    const room = rooms.get(code);
     if(!room){
         return fail('Room Not found');
     }
@@ -22,6 +33,8 @@ function validatePlayer( room, playerId){
     }
     return success({player});
 }
+
+
 
 function validateHost( room, playerId){
     if (room.hostId !== playerId) {
@@ -103,4 +116,11 @@ function validateSettings(room, settings) {
     return success();
 }
 
-module.exports = { validateRoom, validatePlayer, validateHost, validatePhase, validateSettings };
+function validateHasVoted(player){
+    if(player.hasVoted){
+        return fail('You have already voted.');
+    }
+    return success();
+}
+
+module.exports = { validateRoom, validatePlayer, validateHost, validatePhase, validateSettings, validateHasVoted };

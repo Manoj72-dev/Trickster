@@ -1,50 +1,35 @@
-const { createRoom, joinRoom, removePlayer, getRoom, makeHost, togglePlayer, changeSettings } = require('../services/roomService');
-const { getPublicRoomObject } = require('../models/Room');
-const { validateSettingsChange, validateCanBe } = require('../managers/validationManager');
-const { changeRoomSettings } = require('../managers/roomManager')
+const { validateJoin, validateCreate, validateLeave, validateSettingsChange, validateCanBe } = require('../managers/validationManager');
+const { roomCreation, roomJoining, changeRoomSettings } = require('../managers/roomManager')
+const { EVENTS } = require('./socketEvents');
 module.exports = (io, socket) => {
 
-    socket.on('room:create', ({ playerName }) => {
-        if (!playerName?.trim()) {
-            socket.emit('room:error', 'Player name is required.');
+    socket.on(EVENTS.ROOM_CREATE, ({ playerName }) => {
+        const result = validateCreate(socket, playerName?.trim());
+        if(!result.success){
+            console.log(result.error);
             return;
         }
 
-        const { room } = createRoom(socket.id, playerName.trim());
-        socket.join(room.roomCode);
-        socket.emit('room:created', getPublicRoomObject(room));
-
+        roomCreation(playerName);
     });
 
-    socket.on('room:join', ({ roomCode, playerName }) => {
-        if (!playerName?.trim()) {
-            socket.emit('room:error', 'Player name is required.');
-            return;
-        }
-        if (!roomCode?.trim()) {
-            socket.emit('room:error', 'Room code is required.');
-            return;
-        }
+    socket.on(EVENTS.ROOM_JOIN, ({ roomCode, playerName }) => {
 
-        const { room, error } = joinRoom(roomCode.trim(), socket.id, playerName.trim());
-        if (error) {
-            socket.emit('room:error', error);
+        const result = validateJoin(socket, roomCode?.trim(), playerName?.trim());
+
+        if(!result.success){
+            console.log(result.error);
             return;
         }
 
-        io.to(room.roomCode).emit('chat:message', {
-            type: 'system',
-            text: `${playerName.trim()} joined the lobby.`,
-        });
-        socket.join(room.roomCode);
-        socket.emit('room:joined', getPublicRoomObject(room));
-        io.to(room.roomCode).emit('room:updated', getPublicRoomObject(room));
-
+        roomJoining(io, socket, result.room, playerName);
     });
 
-    socket.on('room:leave', ({ roomCode }) => {
-        if (!roomCode?.trim()) {
-            socket.emit('room:error', 'Room code is required.');
+    socket.on(EVENTS.ROOM_LEAVE, ({ roomCode }) => {
+        const result = validateLeave( socket, roomCode?.trim());
+
+        if(!result.success){
+            console.log(result.error);
             return;
         }
 
@@ -148,7 +133,7 @@ module.exports = (io, socket) => {
         }
         if (!message?.trim()) return;
 
-        const roomResult = getRoom(roomCode.trim());
+        const {roomResult} = getRoom(roomCode.trim());
         if (!roomResult) return;
 
         const { room } = roomResult;

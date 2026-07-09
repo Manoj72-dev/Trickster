@@ -36,6 +36,7 @@ export function registerSocketHandlers() {
     socket.on(EVENTS.ROOM_UPDATED, (room)=>{
         store.setRoom(room);
         store.setScreen(room.phase)
+        console.log(room.phase);
     })
 
     socket.on(EVENTS.ROOM_LEFT, ()=>{

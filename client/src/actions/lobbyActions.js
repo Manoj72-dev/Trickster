@@ -51,7 +51,7 @@ export function toggleReady(roomCode){
 }
 
 export function changeSetting(roomCode, settings) {
-  emit(EVENTS.ROOM_SETTING_CHANGE, {
+  emit(EVENTS.ROOM_SETTING, {
     roomCode,
     settings,
   });

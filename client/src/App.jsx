@@ -12,6 +12,7 @@ import Home from './pages/Home'
 import Lobby from './pages/Lobby'
 import Starting from './pages/Starting'
 import HintPhase from './pages/HintPhase'
+import VotingPhase from './pages/VotingPhase'
 
 import { presets } from './AnimatedContainer/presets'
 
@@ -33,6 +34,10 @@ function GameScreen() {
     },
     hint: {
       component: HintPhase,
+      presets: 'fade',
+    },
+    voting: {
+      component: VotingPhase,
       presets: 'fade',
     },
   };

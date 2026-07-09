@@ -11,7 +11,7 @@ function PlayersList() {
   const roomCode = useGameState(state => state.room?.roomCode);
   const hostId = useGameState(state => state.room?.hostId);
   const socketId = useGameState(state => state.socketId);
-
+  const screen = useGameState(state=> state.screen)
   const {makeHost, kickPlayer} = useGameActions()
 
   useEffect(() => {
@@ -25,6 +25,14 @@ function PlayersList() {
 
 
   const isHostViewing = hostId === socketId;
+
+
+  return(
+    <div>
+      
+      
+    </div>
+  )
 
   return (
     <div className="font-mono p-2 flex flex-col gap-4">

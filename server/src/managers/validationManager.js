@@ -1,9 +1,59 @@
 const { success, fail } = require("../utils/validationResult");
-const { validateRoom, validatePlayer, validateHost, validatePhase, validateSettings } = require('../services/validationService')
+const { validateRoom, validatePlayer, validatejoin, validateName, validateHost, validatePhase, validateSettings, validateHasVoted } = require('../services/validationService')
 
 function sendError(socket, message) {
     socket.emit('room:error', message);
     return fail(message);
+}
+
+function validateCreate(socket, playerName){
+    const nameResult = validateName(playerName);
+    if(!nameResult.success){
+        return sendError(socket, nameResult.message);
+    }
+    return success();
+}
+
+function validateJoin(socket, roomCode, playerName){
+    const roomResult = validateRoom(roomCode);
+    if(!roomResult.success){
+        return sendError(socket, roomResult.message);
+    }
+
+    const nameResult = validateName(playerName);
+    if(!nameResult.success){
+        return sendError(socket, nameResult.message);
+    }
+
+    const phaseResult = validatePhase(roomResult.room, 'lobby');
+    if(!phaseResult.success){
+        return sendError(socket, phaseResult.message);
+    }
+    
+    const joinResult = validatejoin(roomResult.room, playerName);
+    if(!joinResult.success){
+        return sendError(socket, joinResult.message);
+    }
+
+    return success({
+        room: roomResult.room
+    });
+}
+
+function validateLeave( roomCode, playerId){
+    const roomResult = validateRoom(roomCode);
+    if(!roomResult.success){
+        return sendError(socket, roomResult.message);
+    }
+
+    const nameResult = validateName(playerName);
+    if(!nameResult.success){
+        return sendError(socket, nameResult.message);
+    }
+
+    return success({
+        room: roomResult.room
+    });
 }
 
 function validateSettingsChange(socket, roomCode, settings){
@@ -73,5 +123,30 @@ function validateCanBe(socket, roomCode, playerId){
     })
 }
 
+function validateVoteSubmission(socket, roomCode, playerId){
+    const roomResult = validateRoom(roomCode);
+    if(!roomResult){
+        return sendError(socket, roomResult.message);
+    }
 
-module.exports = { validateSettingsChange ,validateCanBe}
+    const player1Result = validatePlayer(roomResult.room, socket.id);
+    if(!player1Result.success){
+        return sendError(socket, player1Result.message);
+    }
+
+    const player2Result = validatePlayer(roomResult.room, playerId);
+    if(!player2Result.success){
+        return sendError(socket, player2Result.message);
+    }
+
+    const result = validateHasVoted(player1Result.player);
+    if(!result.success){
+        return sendError(socket, result.message);
+    }
+    
+    return success({
+        room: roomResult.room,
+    })
+}
+
+module.exports = { validateCreate, validateJoin, validateLeave, validateSettingsChange ,validateCanBe, validateVoteSubmission }

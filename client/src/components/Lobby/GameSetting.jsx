@@ -10,13 +10,13 @@ function GameSetting({ close }) {
 
   const settingsFromStore = useGameState(state => state.room?.settings);
 
-  const players = useGameState(state => state.room?.players ?? []);
+  const hostId = useGameState(state => state.room?.hostId ?? []);
   const roomCode = useGameState(state => state.room?.roomCode);
   const socketId = useGameState(state => state.socketId);
 
   const [settings, setSettings] = useState(settingsFromStore);
 
-  const {changeSetting} = useGameActions();
+  const { changeSetting } = useGameActions();
 
   useEffect(()=>{
     if(settingsFromStore){
@@ -26,7 +26,7 @@ function GameSetting({ close }) {
 
   if (!settings) return null;
 
-  const isHost = players.find((player) => player.id === socketId)?.isHost || false;
+  const isHost = socketId === hostId;
 
   const formatTime = (seconds) => {
     const min = Math.floor(seconds / 60);

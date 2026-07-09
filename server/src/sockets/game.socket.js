@@ -2,7 +2,9 @@ const { getPublicRoomObject } = require("../models/Room");
 const { getRoom } = require("../services/roomService")
 const { selectWord, selectImposter, markCompleted } = require('../services/gameService')
 
-const { startPhaseCompleted, hintSubmit } = require('../managers/gameManager')
+const { startPhaseCompleted, hintSubmit, voteSubmisision } = require('../managers/gameManager');
+const { validateVoteSubmission } = require('../managers/validationManager');
+
 module.exports = (io, socket) =>{
     socket.on('game:start', ({roomCode})=>{
         if(!roomCode?.trim()){
@@ -80,4 +82,16 @@ module.exports = (io, socket) =>{
         }
         hintSubmit(io, socket.id, room, hint);
     })
+
+    socket.on('vote:submit', ({roomCode, playerId}) => {
+        
+        const result = validateVoteSubmission(socket, roomCode, playerId);
+
+        if(!result.success){
+            console.log(result.message);
+            return;
+        }
+
+        voteSubmisision(io, socket.id, result.room, playerId);
+    });
 }

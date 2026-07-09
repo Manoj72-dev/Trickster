@@ -1,7 +1,7 @@
 const { rooms, connections } = require('../store/rooms');
 const generateRoomCode = require('../utils/generateCode');
 const { createRoomObject } = require('../models/Room');
-const { createPlayerObject } = require('../models/Player');
+const { createPlayerObject } = require('../models/Player')
 
 function getRoom(roomCode) {
     return rooms.get(roomCode.toUpperCase()) || null;
@@ -25,26 +25,18 @@ function createRoom(hostId, hostName) {
     rooms.set(roomCode, room);
     connections.set(hostId, { roomCode, playerName: hostName });
 
-    return { room };
+    return { success:true, room };
 }
 
-function joinRoom(roomCode, socketId, playerName) {
-    const room = rooms.get(roomCode.toUpperCase());
-    if (!room) return { error: 'Room not found.' };
-
-    if (room.phase !== 'lobby') return { error: 'Game already started.' };
-
-    if (room.players.size >= room.settings.maxPlayers) return { error: 'Room is full.' };
-
-    const nameTaken = [...room.players.values()]
-        .find(p => p.name.toLowerCase() === playerName.toLowerCase());
-    if (nameTaken) return { error: 'Name already taken in this room.' };
+function joinRoom(room, socketId, playerName) {
 
     const player = createPlayerObject(socketId, playerName);
+
     room.players.set(socketId, player);
+
     connections.set(socketId, { roomCode: room.roomCode, playerName });
 
-    return { room };
+    return { success:true, room };
 }
 
 function removePlayer(roomCode, socketId) {

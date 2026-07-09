@@ -11,8 +11,12 @@ export const EVENTS = {
     PLAYER_READY: 'player:toggle',
     PLAYER_KICKED: 'room:kicked',
 
+    PLAYER_KICK: 'kick:player',
+    MAKE_HOST: 'room:host',
+
     ROOM_ERROR: "room:error",
     ROOM_UPDATED: 'room:updated',
+    ROOM_SETTING: 'room:settings',
 
     CHAT_SEND: 'chat:send',
     CHAT_MESSAGE: 'chat:message',
@@ -23,4 +27,6 @@ export const EVENTS = {
 
     PHASE_HINT: 'phase:hint',
     HINT_SUBMIT: 'hint:submit',
+
+    VOTE_SUBMIT: 'vote:submit',
 }
