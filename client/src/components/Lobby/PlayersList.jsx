@@ -2,37 +2,56 @@ import { useState, useRef, useEffect } from "react";
 import { LuCrown, LuUserX, LuEllipsisVertical } from "react-icons/lu";
 import { useGameState } from "../../hooks/useGameState";
 import { useGameActions } from '../../hooks/useGameActions'
+import PlayerCard from "../PlayerCards";
+
 function PlayersList() {
-  const [openMenu, setOpenMenu] = useState(null);
-  const menuRef = useRef(null);
-  
-  const players = useGameState(state => state.room?.players ?? []);
-  const maxPlayers = useGameState(state => state.room?.settings?.maxPlayers);
-  const roomCode = useGameState(state => state.room?.roomCode);
-  const hostId = useGameState(state => state.room?.hostId);
-  const socketId = useGameState(state => state.socketId);
-  const screen = useGameState(state=> state.screen)
-  const {makeHost, kickPlayer} = useGameActions()
-
-  useEffect(() => {
-    const handler = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target))
-        setOpenMenu(null);
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
-
-
-  const isHostViewing = hostId === socketId;
-
+  const players = useGameState(state => state.room.players)
+  const maxPlayers = useGameState(state => state.room.settings.maxPlayers)
 
   return(
-    <div>
-      
-      
+    <div className="font-mono p-2  py-0 flex flex-col gap-2 min-[920px]:h-[540px]">
+      <span className="text-lg font-bold text-white/80 max-[500px]:text-sm">
+        PLAYERS ({players.length}/{maxPlayers})
+      </span>
+      <div className="max-h-[550px] overflow-auto hide-scrollbar">
+        <PlayerCard/>
+      </div>
+      <div>
+
+      </div>
     </div>
   )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   return (
     <div className="font-mono p-2 flex flex-col gap-4">

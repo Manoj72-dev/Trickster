@@ -8,25 +8,37 @@ export const EVENTS = {
     ROOM_LEAVE: 'room:leave',
     ROOM_LEFT: 'room:left',
 
-    PLAYER_READY: 'player:toggle',
-    PLAYER_KICKED: 'room:kicked',
+    ROOM_UPDATE: 'room:update',
+    ROOM_ERROR: 'room:error',
 
-    PLAYER_KICK: 'kick:player',
-    MAKE_HOST: 'room:host',
+    ROOM_SETTING_CHANGE: 'room:setting-change',
 
-    ROOM_ERROR: "room:error",
-    ROOM_UPDATED: 'room:updated',
-    ROOM_SETTING: 'room:settings',
-
-    CHAT_SEND: 'chat:send',
     CHAT_MESSAGE: 'chat:message',
-    GAME_START: 'game:start',
-    START_COMPLETED: 'start:completed',
-    
-    GAME_WORD: 'game:word',
+    CHAT_SEND: 'chat:send',
 
-    PHASE_HINT: 'phase:hint',
+    PLAYER_TOGGLE: 'player:toggle',
+
+    PLAYER_KICK: 'player:kick',
+    PLAYER_KICKED: 'player:kicked',
+
+    PLAYER_MAKE_HOST: 'player:make-host',
+    PLAYER_HOST: 'player:host',
+
+    GAME_START: 'game:start',
+    GAME_STARTING: 'game:starting',
+    GAME_OVER: 'game:over',
+
+    ROUND_START: 'round:start',
+    ROUND_END: 'round:end',
+
+    PHASE_CHANGE: 'phase:change',
+
     HINT_SUBMIT: 'hint:submit',
+    HINT_SUBMITTED: 'hint:submitted',
 
     VOTE_SUBMIT: 'vote:submit',
+    VOTE_SUBMITED: 'vote:submitted',
+
+    RETURN_HOME: 'return:home',
+    RETURN_LOBBY: 'return:lobby',
 }

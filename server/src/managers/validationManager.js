@@ -1,6 +1,6 @@
 const { success, fail } = require("../utils/validationResult");
-const { validateRoom, validatePlayer, validatejoin, validateName, validateHost, validatePhase, validateSettings, validateHasVoted } = require('../services/validationService')
-
+const { validateRoom, validatePlayer, validateRoomCapacity, validateName, validateHost, validatePhase, validateSettings, validateHasVoted, validateMessageLenght } = require('../services/validationService')
+ 
 function sendError(socket, message) {
     socket.emit('room:error', message);
     return fail(message);
@@ -29,10 +29,10 @@ function validateJoin(socket, roomCode, playerName){
     if(!phaseResult.success){
         return sendError(socket, phaseResult.message);
     }
-    
-    const joinResult = validatejoin(roomResult.room, playerName);
-    if(!joinResult.success){
-        return sendError(socket, joinResult.message);
+
+    const result = validateRoomCapacity(roomResult.room);
+    if(!result.success){
+        return sendError(socket, result.message);
     }
 
     return success({
@@ -40,15 +40,15 @@ function validateJoin(socket, roomCode, playerName){
     });
 }
 
-function validateLeave( roomCode, playerId){
+function validateLeave(socket, roomCode){
     const roomResult = validateRoom(roomCode);
     if(!roomResult.success){
         return sendError(socket, roomResult.message);
     }
 
-    const nameResult = validateName(playerName);
-    if(!nameResult.success){
-        return sendError(socket, nameResult.message);
+    const playerResult = validatePlayer(roomResult.room, socket.id);
+    if(!playerResult.success){
+        return sendError(socket, playerResult.message);
     }
 
     return success({
@@ -87,7 +87,30 @@ function validateSettingsChange(socket, roomCode, settings){
     });
 }
 
+function validateToggle(socket, roomCode){
+    
+    const roomResult = validateRoom(roomCode);
+    if(!roomResult.success){
+        return sendError(socket, roomResult.message);
+    }
+
+    const playerResult = validatePlayer(roomResult.room, socket.id);
+    if(!playerResult.success){
+        return sendError(socket, playerResult.message);
+    }
+
+    const phaseResult = validatePhase(roomResult.room, 'lobby');
+    if(!phaseResult.success){
+        return sendError(socket, hostresult.message);
+    }
+
+    return success({
+        room: roomResult.room,
+    });
+}
+
 function validateCanBe(socket, roomCode, playerId){
+
     const roomResult = validateRoom(roomCode);
     if(!roomResult){
         return sendError(socket, roomResult.message);
@@ -149,4 +172,34 @@ function validateVoteSubmission(socket, roomCode, playerId){
     })
 }
 
-module.exports = { validateCreate, validateJoin, validateLeave, validateSettingsChange ,validateCanBe, validateVoteSubmission }
+function validateMessage(socket, roomCode, message){
+    const roomResult = validateRoom(roomCode);
+    if(!roomResult){
+        return sendError(socket, roomResult.message);
+    }
+
+    const playerResult = validatePlayer(roomResult.room, socket.id);
+    if(!playerResult.success){
+        return sendError(socket, playerResult.message);
+    }
+    const phaseResult = validatePhase(roomResult.room, 'lobby');
+    if(!phaseResult.success){
+        return sendError(socket, phaseResult.message)
+    }
+
+    const phase2Result = validatePhase(roomResult.room, 'voting');
+    if(!phaseResult.success){
+        return sendError(socket, phaseResult.message)
+    }
+
+    const lengthResult = validateMessageLenght(message);
+    if(!lengthResult.success){
+        return sendError(socket, lengthResult.message);
+    }
+    return success({
+        room: roomResult.room,
+        player: playerResult.player,
+    })
+}
+
+module.exports = { validateCreate, validateJoin, validateLeave, validateSettingsChange , validateToggle, validateCanBe, validateVoteSubmission, validateMessage }

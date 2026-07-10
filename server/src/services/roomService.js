@@ -1,7 +1,8 @@
 const { rooms, connections } = require('../store/rooms');
 const generateRoomCode = require('../utils/generateCode');
 const { createRoomObject } = require('../models/Room');
-const { createPlayerObject } = require('../models/Player')
+const { createPlayerObject } = require('../models/Player');
+const { success } = require('../utils/validationResult');
 
 function getRoom(roomCode) {
     return rooms.get(roomCode.toUpperCase()) || null;
@@ -39,20 +40,15 @@ function joinRoom(room, socketId, playerName) {
     return { success:true, room };
 }
 
-function removePlayer(roomCode, socketId) {
-    const room = rooms.get(roomCode.toUpperCase());
-    if (!room) return { error: 'Room not found.' };
-
-    const result = getPlayer(roomCode, socketId);
-    if (!result) return { error: 'Player not found.' };
-    const { player } = result;
-
+function removePlayer(room, socketId) {
+   
+    const player = room.players.get(socketId);
     room.players.delete(socketId);
     connections.delete(socketId);
 
     if (room.players.size === 0) {
-        rooms.delete(roomCode.toUpperCase());
-        return { deleted: true, player };
+        rooms.delete(room.roomCode);
+        return { success: true, deleted: true, player };
     }
 
     if (player.isHost) {
@@ -61,35 +57,30 @@ function removePlayer(roomCode, socketId) {
         room.hostId = nextPlayer.id;
     }
 
-    return { room, player };
+    return { success:true, deleted: false, player };
 }
 
-function makeHost(roomCode, playerId) {
-    const room = rooms.get(roomCode.toUpperCase());
-    if (!room) return { error: 'Room not found.' };
+function makeHost(room, playerId) {
 
     const player = room.players.get(playerId);
-    if (!player) return { error: 'Player not found.' };
 
     const currentHost = room.players.get(room.hostId);
-    if (currentHost) currentHost.isHost = false;
 
+    currentHost.isHost = false;
     player.isHost = true;
     room.hostId = playerId;
 
-    return { room, player };
+    return { success: true, player };
 }
 
-function togglePlayer(roomCode, socketId) {
-    const room = rooms.get(roomCode.toUpperCase());
-    if (!room) return { error: 'Room not found.' };
+function togglePlayer(room, socketId) {
 
     const player = room.players.get(socketId);
-    if (!player) return { error: 'Player not found.' };
 
     player.isReady = !player.isReady;
 
-    return { room, player };
+    return { success: true };
+
 }
 
 function changeSettings( room, settings) {
@@ -97,6 +88,7 @@ function changeSettings( room, settings) {
     room.settings.maxPlayers = maxPlayers;
     room.settings.hintTime = hintTime;
     room.settings.voteTime = voteTime;
+    return {success: true}
 }
 
 module.exports = { createRoom, joinRoom, removePlayer, getRoom, getPlayer, makeHost, togglePlayer, changeSettings };

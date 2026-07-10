@@ -10,6 +10,9 @@ function Lobby(){
     const room = useGameState(state => state.room)
     const socketId = useGameState(state => state.socketId);
 
+    const setError = useGameState(state => state.setError);
+    
+
     const { toggleReady, leaveLobby, startGame} = useGameActions();
     if (!room) return null;
     const roomCode = room.roomCode;
@@ -22,7 +25,7 @@ function Lobby(){
 
     const handleStart = () =>{
         if(!enoughPlayers){
-            alert("Need at least 3 players to start.");
+            setError("Need at least 3 players to start.");
             return;
         }
         if(!allReady){
@@ -35,44 +38,56 @@ function Lobby(){
     return(
         <div>
             <NavBar/>
-            <div className="p-3 grid gap-4 grid-cols-2 max-[630px]:grid-cols-1 min-h-[580px] ">
-                <PlayersList/>
-                <Chat/>
-                
-                
-            </div>
-                <div className="text-white/80 flex justify-between p-2 font-mono">
-                    <div className="flex gap-3 ml-2">
-                        <button onClick={() => toggleReady(roomCode)}
-                            className={`font-bold border min-w-[120px] rounded-xl p-2 active:scale-95 transition duration-300 text-xl
-                                ${me?.isReady 
-                                    ? 'bg-white text-black' 
-                                    : 'hover:bg-white hover:text-black hover:scale-110'}`}>
-                            {me?.isReady ? 'Not ready' : 'Ready'}
-                        </button>
-                        <button className="font-bold border rounded-xl p-2
-                            hover:bg-white hover:text-black hover:scale-110
-                            active:bg-white active:text-black active:scale-95
-                            transition duration-300 text-xl"
-                            onClick={() => leaveLobby(roomCode)}>
-                            Leave
-                        </button>
-                    </div>
-                    <div className="mr-2">
+            <div className='flex p-2 justify-between font-mono px-2'>
+                <span className='flex items-center text-white/90 text-2xl max-[500px]:text-xl mx-3 font-bold'>
+                    Lobby
+                </span>
+                <div className="mr-2">
+                    {Host &&
                         <button
                             onClick={() => {handleStart()}}
                             disabled={!Host}
-                            className={`min-w-[130px] rounded-xl p-2 font-bold text-xl transition duration-300
-                            ${
-                                Host
-                                ? "bg-red-500 hover:scale-110 active:scale-95"
-                                : "bg-red-500/40 opacity-50 cursor-not-allowed"
-                            }`}
+                            className={`min-w-[120px] rounded-xl py-1 font-bold text-xl transition duration-300
+                            bg-white/90 border border-white hover:scale-110 active:scale-95"
+                            max-[500px]:min-w-[100px] max-[500px]:text-lg`}
                         >
-                            Start Game
+                            Start
                         </button>
+                    }
+                 </div>
+            </div>
+            <div className="p-3 grid gap-4 grid-cols-2 max-[920px]:grid-cols-1 pt-1">
+                <div className=''>
+                    <PlayersList/>
+                    
+                    <div className="text-white/80  font-mono flex justify-between ml-2 ">
+                        <button className="font-bold border rounded-xl px-2 py-1
+                            hover:scale-110 bg-[#e0263f]
+                            active:scale-95
+                            transition duration-300 text-xl max-[500px]:text-lg"
+                            onClick={() => leaveLobby(roomCode)}>
+                            Leave
+                        </button>
+                        <button onClick={() => toggleReady(roomCode)}
+                            className={`font-bold border min-w-[120px] rounded-xl py-1 px-2 whitespace-nowrap  active:scale-95 transition duration-300 text-xl bg-[#5DCAA5]
+                                max-[500px]:text-lg hover:scale-110 text-white/80
+                                ${me?.isReady 
+                                    ? 'bg-[#e0263f] ' : ''}`
+                            }
+                        >
+
+                            {me?.isReady ? 'Not ready' : 'Ready'}
+                        </button>
+                        
                     </div>
+                    
+                
                 </div>
+                <div >
+                    <Chat/>
+                </div>                
+            </div>
+                
         </div>
     )
 }

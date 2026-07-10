@@ -8,7 +8,7 @@ export function registerSocketHandlers() {
     socket.off(EVENTS.ROOM_CREATED);
     socket.off(EVENTS.ROOM_JOINED);
     socket.off(EVENTS.ROOM_ERROR);
-    socket.off(EVENTS.ROOM_UPDATED);
+    socket.off(EVENTS.ROOM_UPDATE);
     socket.off(EVENTS.ROOM_LEFT);
     socket.off(EVENTS.PLAYER_KICKED);
     socket.off(EVENTS.CHAT_MESSAGE)
@@ -30,13 +30,15 @@ export function registerSocketHandlers() {
     })
 
     socket.on(EVENTS.ROOM_ERROR, (error) =>{
-        console.log(error);
+        store.setLoading(false);
+        store.setError(error);
+        
     })
 
-    socket.on(EVENTS.ROOM_UPDATED, (room)=>{
+    socket.on(EVENTS.ROOM_UPDATE, (room)=>{
         store.setRoom(room);
         store.setScreen(room.phase)
-        console.log(room.phase);
+        console.log(room);
     })
 
     socket.on(EVENTS.ROOM_LEFT, ()=>{

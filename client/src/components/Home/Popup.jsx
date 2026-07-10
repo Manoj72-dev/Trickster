@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useGameState } from "../../hooks/useGameState";
 import {  useGameActions } from '../../hooks/useGameActions'
-function Popup({ type, close }) {
+function Popup({ type, close, setButton }) {
   const [roomCode, setRoomCode] = useState('');
 
   const nameInputRef = useRef(null);
@@ -59,9 +59,10 @@ function Popup({ type, close }) {
       nameInputRef.current?.focus();
       return;
     }
-
+    setButton('create')
     createRoom(name);
-  };
+    handleClose();
+  }
 
   const handleJoin = () => {
     const name = playerName.trim()
@@ -97,7 +98,10 @@ function Popup({ type, close }) {
       codeInputRef.current?.focus();
       return;
     }
+    setButton('join')
     joinRoom(code, name);
+    close();
+    handleClose();
   }
 
   return (

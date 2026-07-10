@@ -1,5 +1,5 @@
-const { validateJoin, validateCreate, validateLeave, validateSettingsChange, validateCanBe } = require('../managers/validationManager');
-const { roomCreation, roomJoining, changeRoomSettings } = require('../managers/roomManager')
+const { validateJoin, validateCreate, validateLeave, validateSettingsChange, validateToggle, validateCanBe, validateMessage } = require('../managers/validationManager');
+const { roomCreation, roomJoining, roomLeave, playerToggle, kickPlayer, changeRoomSettings, makePlayerHost, sendMessage } = require('../managers/roomManager')
 const { EVENTS } = require('./socketEvents');
 module.exports = (io, socket) => {
 
@@ -10,7 +10,7 @@ module.exports = (io, socket) => {
             return;
         }
 
-        roomCreation(playerName);
+        roomCreation(socket, playerName);
     });
 
     socket.on(EVENTS.ROOM_JOIN, ({ roomCode, playerName }) => {
@@ -32,37 +32,23 @@ module.exports = (io, socket) => {
             console.log(result.error);
             return;
         }
-
-        const { room, player, deleted, error } = removePlayer(roomCode.trim(), socket.id);
-        if (error) {
-            socket.emit('room:error', error);
-            return;
-        }
-
-        socket.leave(roomCode);
-        socket.emit('room:left');
-        if (deleted) return;
-
-        io.to(room.roomCode).emit('room:updated', getPublicRoomObject(room));
-        io.to(room.roomCode).emit('chat:message', {
-            type: 'system',
-            text: `${player.name} left the lobby.`,
-        });
+        
+        roomLeave(io, socket, result.room);
+       
     });
 
-    socket.on('room:settings', ({ roomCode, settings }) => {
+    socket.on(EVENTS.ROOM_SETTING_CHANGE, ({ roomCode, settings }) => {
         
         const result = validateSettingsChange(socket, roomCode, settings);
-
+       
         if(!result.success){
             console.log(result.message);
             return;
         }
-
         changeRoomSettings(io, result.room, settings);
     });
 
-    socket.on('kick:player', ({ roomCode, playerId }) => {
+    socket.on(EVENTS.PLAYER_KICK, ({ roomCode, playerId }) => {
         const result = validateCanBe(socket, roomCode, playerId);
 
         if(!result.success){
@@ -70,83 +56,44 @@ module.exports = (io, socket) => {
             return;
         }
 
-        const { room, player, deleted, error } = removePlayer(roomCode.trim(), playerId);
-        if (error) {
-            socket.emit('room:error', error);
-            return;
-        }
-
-        io.to(playerId).emit('room:kicked');
-        const kickSocket = io.sockets.sockets.get(playerId);
-        if (kickSocket) {
-            kickSocket.leave(roomCode);
-        }
-        if (deleted) return;
-
-        io.to(room.roomCode).emit('room:updated', getPublicRoomObject(room));
-        io.to(room.roomCode).emit('chat:message', {
-            type: 'system',
-            text: `${player.name} was kicked.`,
-        });
+        kickPlayer(io, socket, result.room, playerId);
+        
     });
 
-    socket.on('room:host', ({ roomCode, playerId }) => {
+    socket.on(EVENTS.PLAYER_MAKE_HOST, ({ roomCode, playerId }) => {
+
         const result = validateCanBe(socket, roomCode, playerId);
 
         if(!result.success){
             console.log(result.message);
             return;
         }
-
-        const { room, player, error } = makeHost(roomCode.trim(), playerId);
-        if (error) {
-            socket.emit('room:error', error);
-            return;
-        }
-
-        io.to(room.roomCode).emit('room:updated', getPublicRoomObject(room));
-        io.to(room.roomCode).emit('chat:message', {
-            type: 'system',
-            text: `${player.name} is now the host.`,
-        });
+        makePlayerHost(io, socket, result.room, playerId);
     });
 
-    socket.on('player:toggle', ({ roomCode }) => {
-        if (!roomCode?.trim()) {
-            socket.emit('room:error', 'Room code is required.');
+    socket.on(EVENTS.PLAYER_TOGGLE, ({ roomCode }) => {
+        const result = validateToggle(socket, roomCode)
+        
+        if(!result.success){
+            console.log(result.message);
             return;
         }
 
-        const { room, error } = togglePlayer(roomCode.trim(), socket.id);
-        if (error) {
-            socket.emit('room:error', error);
-            return;
-        }
+        playerToggle(io, socket, result.room)
 
-        io.to(room.roomCode).emit('room:updated', getPublicRoomObject(room));
     });
 
-    socket.on('chat:send', ({ roomCode, message }) => {
-        if (!roomCode?.trim()) {
-            socket.emit('room:error', 'Room code is required.');
+    socket.on(EVENTS.CHAT_SEND, ({ roomCode, message }) => {
+        const result = validateMessage(socket, roomCode, message)
+
+        if(!result.success){
+            console.log(result.message);
             return;
         }
-        if (!message?.trim()) return;
 
-        const {roomResult} = getRoom(roomCode.trim());
-        if (!roomResult) return;
+        sendMessage(io, result.room, result.player, message);
 
-        const { room } = roomResult;
-
-        const player = room.players.get(socket.id);
-        if (!player) return;
-
-        io.to(room.roomCode).emit('chat:message', {
-            type: 'chat',
-            senderId: player.id,
-            senderName: player.name,
-            text: message.trim(),
-        });
+        
     });
 
 };

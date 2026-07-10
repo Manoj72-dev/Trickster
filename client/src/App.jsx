@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { use, useEffect } from 'react'
 import { AnimatePresence } from 'framer-motion'
 
 import { useGameState } from './hooks/useGameState'
@@ -13,12 +13,11 @@ import Lobby from './pages/Lobby'
 import Starting from './pages/Starting'
 import HintPhase from './pages/HintPhase'
 import VotingPhase from './pages/VotingPhase'
-
-import { presets } from './AnimatedContainer/presets'
+import Toast from './components/Toast'
 
 function GameScreen() {
   const screen = useGameState(state => state.screen)
-
+  
   const screens = {
     home: {
       component: Home,
@@ -49,6 +48,7 @@ function GameScreen() {
   const Screen = current.component;
 
   return (
+    <>
     <AnimatePresence  mode="wait">
       <AnimatedContainer 
         key={screen} 
@@ -57,6 +57,7 @@ function GameScreen() {
             <Screen />
       </AnimatedContainer>
     </AnimatePresence>
+    </>
   )
 }
 
@@ -68,6 +69,7 @@ function App() {
   return (
     <>
       <StarsCanvas />
+      <Toast/>
       <GameScreen />
     </>
   )

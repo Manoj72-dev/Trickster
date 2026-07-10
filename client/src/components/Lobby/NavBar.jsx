@@ -11,14 +11,14 @@ function NavBar(){
     return(
         <div>
             <nav>
-                <div className="flex p-2 bg-zinc-500/10 backdrop-blur-sm justify-between items-center">
+                <div className="flex p-2 bg-[#0D1117] justify-between items-center">
                     <div>
                         <span 
                             className="text-white font-bold font-mono text-xl"
                         >
                             TRICK
                             <span 
-                                className="text-red-500 font-bold"
+                                className="text-[#e0263f] font-bold"
                             >
                                 STER
                             </span>
@@ -35,7 +35,7 @@ function NavBar(){
                                     Code
                                 </span>
                             </div> 
-                            <span className="text-red-500 font-bold text-xl leading-none">
+                            <span className="text-[#e0263f] font-bold text-xl leading-none">
                                 {roomCode}
                             </span>
                         </div>

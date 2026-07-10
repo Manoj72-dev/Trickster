@@ -15,7 +15,7 @@ function validateRoom(roomCode){
     if(!code?.trim()){
         return fail('RoomCode is requried');
     }
-    if(code.length < 6 || codeode.length > 6){
+    if(code.length < 6 || code.length > 6){
         return fail('RoomCode should be of 6 charaters');
     }
 
@@ -34,7 +34,12 @@ function validatePlayer( room, playerId){
     return success({player});
 }
 
-
+function validateRoomCapacity(room){
+    if(room.players.size >= room.settings.maxPlayers){
+        return fail('Room is full.');
+    }
+    return success();
+}
 
 function validateHost( room, playerId){
     if (room.hostId !== playerId) {
@@ -123,4 +128,12 @@ function validateHasVoted(player){
     return success();
 }
 
-module.exports = { validateRoom, validatePlayer, validateHost, validatePhase, validateSettings, validateHasVoted };
+function validateMessageLenght(message){
+    if(message?.length > 200){
+        return fail('Message is too long.');
+    }
+    return success();
+}
+
+
+module.exports = { validateRoom, validatePlayer, validateHost, validatePhase, validateSettings, validateHasVoted, validateName, validateRoomCapacity, validateMessageLenght };

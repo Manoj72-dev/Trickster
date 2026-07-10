@@ -45,13 +45,13 @@ export function leaveLobby(roomCode){
 export function toggleReady(roomCode){
     const { setError } = useGameStore.getState()
     setError(null);
-    emit(EVENTS.PLAYER_READY, {
+    emit(EVENTS.PLAYER_TOGGLE, {
         roomCode
     })
 }
 
 export function changeSetting(roomCode, settings) {
-  emit(EVENTS.ROOM_SETTING, {
+  emit(EVENTS.ROOM_SETTING_CHANGE, {
     roomCode,
     settings,
   });
@@ -69,7 +69,8 @@ export function sendChatMessage(message) {
 }
 
 export function makeHost(roomCode, playerId) {
-  emit(EVENTS.MAKE_HOST, {
+  console.log('makeHost');
+  emit(EVENTS.PLAYER_MAKE_HOST, {
     roomCode,
     playerId,
   });
