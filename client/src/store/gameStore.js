@@ -18,6 +18,10 @@ export const useGameStore = create((set) => ({
     myWord: '',
     isImposter: false,
 
+    eliminated: null,
+
+    setEliminated: ( eliminated ) => set({eliminated}),
+
     setConnected: (connected) => set({ connected }),
     setSocketId: (socketId) => set({ socketId }),
 

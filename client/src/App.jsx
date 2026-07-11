@@ -10,10 +10,11 @@ import AnimatedContainer from './AnimatedContainer/AnimatedContainer'
 
 import Home from './pages/Home'
 import Lobby from './pages/Lobby'
-import Starting from './pages/Starting'
+import RoundStart from './pages/RoundStart'
 import HintPhase from './pages/HintPhase'
 import VotingPhase from './pages/VotingPhase'
-import Toast from './components/Toast'
+import RoundEnd from './pages/RoundEnd'
+import Toast from './components/Toast' 
 
 function GameScreen() {
   const screen = useGameState(state => state.screen)
@@ -28,7 +29,7 @@ function GameScreen() {
       preset: "fade",
     },
     starting: {
-      component: Starting,
+      component: RoundStart,
       presets: 'fade',
     },
     hint: {
@@ -39,6 +40,10 @@ function GameScreen() {
       component: VotingPhase,
       presets: 'fade',
     },
+    elimination: {
+      component: RoundEnd,
+      present: 'fade',
+    }
   };
 
   const current = screens[screen];

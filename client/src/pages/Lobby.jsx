@@ -1,7 +1,7 @@
 import { useGameState } from '../hooks/useGameState'
 import { useGameActions } from '../hooks/useGameActions';
 
-import PlayersList from "../components/Lobby/PlayersList"
+import PlayersList from "../components/PlayersList"
 import NavBar from "../components/Lobby/NavBar";
 import Chat from "../components/Chat";
 
@@ -11,7 +11,8 @@ function Lobby(){
     const socketId = useGameState(state => state.socketId);
 
     const setError = useGameState(state => state.setError);
-    
+    const setLoading = useGameState(state => state.setLoading);
+    const loading = useGameState(state => state.loading);
 
     const { toggleReady, leaveLobby, startGame} = useGameActions();
     if (!room) return null;
@@ -20,16 +21,14 @@ function Lobby(){
     const Host = me?.isHost ?? false;
 
     const players = room.players ?? [];
-    const enoughPlayers = players.length >= 3;
-    const allReady = players.every(player => player.isReady);
 
     const handleStart = () =>{
-        if(!enoughPlayers){
+        if(players.length<3){
             setError("Need at least 3 players to start.");
             return;
         }
-        if(!allReady){
-            alert("All players are not ready");
+        if(!players.every(player => player.isReady)){
+            setError("All players are not ready");
             return;
         }
         startGame(roomCode);

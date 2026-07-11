@@ -1,13 +1,27 @@
 import { IoSettingsSharp } from "react-icons/io5";
 import { useState } from "react";
 import { useGameState } from "../../hooks/useGameState";
+import { TbCopy } from "react-icons/tb";
 
 import GameSetting from "./GameSetting";
 function NavBar(){
 
     const [showSettings, setShowSettings] = useState(false);
     const roomCode = useGameState(state => state.room?.roomCode)
+    const [copied, setCopied] = useState(false);
+    
+    const copy = async (text) => {
+        try {
+            await navigator.clipboard.writeText(text);
+            setCopied(true);
 
+            setTimeout(() => {
+                setCopied(false);
+            }, 1500);
+        } catch (err) {
+            console.error("Failed to copy", err);
+        }
+    };
     return(
         <div>
             <nav>
@@ -35,9 +49,17 @@ function NavBar(){
                                     Code
                                 </span>
                             </div> 
-                            <span className="text-[#e0263f] font-bold text-xl leading-none">
+                            <span className="text-[#e0263f] font-bold text-xl leading-none ">
                                 {roomCode}
                             </span>
+                            
+                            <button  onClick={() => copy(roomCode)}
+                                className="hover:text-white transition active:scale-95 hover:scale-105"
+                                title="Copy Room Code"
+                            >
+                                    <TbCopy />
+                            </button>
+                            
                         </div>
                         <div className=" font-mono font-bold">
                             <button 

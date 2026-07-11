@@ -37,7 +37,7 @@ export const EVENTS = {
     HINT_SUBMITTED: 'hint:submitted',
 
     VOTE_SUBMIT: 'vote:submit',
-    VOTE_SUBMITED: 'vote:submitted',
+    VOTE_SUBMITTED: 'vote:submitted',
 
     RETURN_HOME: 'return:home',
     RETURN_LOBBY: 'return:lobby',

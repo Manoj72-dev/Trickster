@@ -1,5 +1,7 @@
 const { success, fail } = require("../utils/validationResult");
-const { validateRoom, validatePlayer, validateRoomCapacity, validateName, validateHost, validatePhase, validateSettings, validateHasVoted, validateMessageLenght } = require('../services/validationService')
+const { validateRoom, validatePlayer, validateRoomCapacity, validateName, validateHost, validatePhase, validateSettings, validateHasVoted, validateMessageLenght,
+    validateStartingCondition, validateHint, validateHasSubmitted
+ } = require('../services/validationService')
  
 function sendError(socket, message) {
     socket.emit('room:error', message);
@@ -20,7 +22,7 @@ function validateJoin(socket, roomCode, playerName){
         return sendError(socket, roomResult.message);
     }
 
-    const nameResult = validateName(playerName);
+    const nameResult = validateName(playerName, roomResult.room);
     if(!nameResult.success){
         return sendError(socket, nameResult.message);
     }
@@ -202,4 +204,77 @@ function validateMessage(socket, roomCode, message){
     })
 }
 
-module.exports = { validateCreate, validateJoin, validateLeave, validateSettingsChange , validateToggle, validateCanBe, validateVoteSubmission, validateMessage }
+function validateStartGame(socket, roomCode){
+    const roomResult = validateRoom(roomCode);
+    if(!roomResult){
+        return sendError(socket, roomResult.message);
+    }
+
+    const playerResult = validatePlayer(roomResult.room, socket.id);
+    if(!playerResult.success){
+        return sendError(socket, playerResult.message);
+    }
+
+    const hostresult = validateHost(roomResult.room, socket.id);
+    if(!hostresult.success){
+        return sendError(socket, hostresult.message);
+    }
+
+    const phaseResult = validatePhase(roomResult.room, 'lobby');
+    if(!phaseResult.success){
+        return sendError(socket, hostresult.message);
+    }
+
+    const conditionResult = validateStartingCondition(roomResult.room);
+    if(!conditionResult.success){
+        return sendError(socket, conditionResult.message);
+    }
+
+    return success({
+        room: roomResult.room
+    });
+}
+
+function validateRound(socket, roomCode){
+    const roomResult = validateRoom(roomCode);
+    if(!roomResult.success){
+        return sendError(socket, roomResult.message);
+    }
+
+    const playerResult = validatePlayer(roomResult.room, socket.id);
+    if(!playerResult.success){
+        return sendError(socket, playerResult.message);
+    }
+
+    return success({
+        room: roomResult.room
+    });
+}
+
+function validateHintSubmission(socket, roomCode, hint){
+    const roomResult = validateRoom(roomCode);
+    if(!roomResult.success){
+        return sendError(socket, roomResult.message);
+    }
+
+    const playerResult = validatePlayer(roomResult.room, socket.id);
+    if(!playerResult.success){
+        return sendError(socket, playerResult.message);
+    }
+
+    const submissionResult = validateHasSubmitted(playerResult.player);
+    if(!submissionResult.success){
+        return sendError(socket, submissionResult.message);
+    }
+
+    const hintResult = validateHint(hint);
+    if(!hintResult.success){
+        return sendError(socket, hintResult.message);
+    }
+
+    return success({
+        room: roomResult.room
+    });
+}
+module.exports = { validateCreate, validateJoin, validateLeave, validateSettingsChange , validateToggle, validateCanBe, validateVoteSubmission, validateMessage, 
+    validateStartGame, validateRound, validateHintSubmission}

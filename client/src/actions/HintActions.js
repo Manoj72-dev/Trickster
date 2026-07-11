@@ -12,8 +12,11 @@ function emit(event, payload){
 }
 
 
-export function startPhaseCompleted(roomCode){
-    emit(EVENTS.START_COMPLETED, {roomCode})
+export function startRound(roomCode){
+    const { setLoading, setError } = useGameStore.getState()
+    setLoading(true);
+    setError(null);
+    emit(EVENTS.ROUND_START, {roomCode})
 }
 
 
@@ -21,7 +24,7 @@ export function startHintPhase(roomCode, phase){
     const { setLoading, setError } = useGameStore.getState()
     setLoading(true);
     setError(null);
-    emit(EVENTS.PHASE_HINT, {roomCode});
+    emit(EVENTS.PHASE_CHANGE, {roomCode});
 }
 
 export function submitHint(roomCode, hint){

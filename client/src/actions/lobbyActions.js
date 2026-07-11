@@ -14,8 +14,9 @@ function emit(event, payload) {
 }
 
 export function createRoom(playerName) {
-    const { setLoading, clearError } = useGameStore.getState()
+    const { setLoading, setError } = useGameStore.getState()
     setLoading(true);
+    setError(null);
     emit(EVENTS.ROOM_CREATE, { playerName });
 }
 
@@ -27,7 +28,8 @@ export function joinRoom(roomCode, playerName) {
 }
 
 export function kickPlayer(roomCode, playerId){
-    const { setError } = useGameStore.getState()
+    const { setLoading, setError } = useGameStore.getState()
+    setLoading(true);
     setError(null);
     emit(EVENTS.PLAYER_KICK, {
         roomCode, playerId
@@ -35,15 +37,17 @@ export function kickPlayer(roomCode, playerId){
 }
 
 export function leaveLobby(roomCode){
-    const { setError } = useGameStore.getState()
-    setError(null)
+    const { setLoading, setError } = useGameStore.getState()
+    setLoading(true);
+    setError(null);
     emit(EVENTS.ROOM_LEAVE,{
         roomCode
     })
 }
 
 export function toggleReady(roomCode){
-    const { setError } = useGameStore.getState()
+    const { setLoading, setError } = useGameStore.getState()
+    setLoading(true);
     setError(null);
     emit(EVENTS.PLAYER_TOGGLE, {
         roomCode
@@ -51,6 +55,9 @@ export function toggleReady(roomCode){
 }
 
 export function changeSetting(roomCode, settings) {
+    const { setLoading, setError } = useGameStore.getState()
+    setLoading(true);
+    setError(null);
   emit(EVENTS.ROOM_SETTING_CHANGE, {
     roomCode,
     settings,
@@ -59,7 +66,9 @@ export function changeSetting(roomCode, settings) {
 
 export function sendChatMessage(message) {
   const { room } = useGameStore.getState();
-
+  const { setLoading, setError } = useGameStore.getState()
+    setLoading(true);
+    setError(null);
   if (!room?.roomCode) return;
 
   emit(EVENTS.CHAT_SEND, {
@@ -69,7 +78,9 @@ export function sendChatMessage(message) {
 }
 
 export function makeHost(roomCode, playerId) {
-  console.log('makeHost');
+    const { setLoading, setError } = useGameStore.getState()
+    setLoading(true);
+    setError(null);
   emit(EVENTS.PLAYER_MAKE_HOST, {
     roomCode,
     playerId,
@@ -77,6 +88,9 @@ export function makeHost(roomCode, playerId) {
 }
 
 export function startGame(roomCode){
+    const { setLoading, setError } = useGameStore.getState()
+    setLoading(true);
+    setError(null);
     emit(EVENTS.GAME_START,{
         roomCode,
     });

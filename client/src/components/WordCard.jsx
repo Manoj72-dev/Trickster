@@ -7,11 +7,11 @@ function WordCard(){
 
     return(
         <>
-            <div className="flex flex-col justify-center items-center py-10 rounded-xl border border-gray-700/70">
+            <div className="flex flex-col bg-[#0D1117] justify-center items-center py-10 rounded-xl border border-gray-700/70 sm:min-h-[200px]">
                 <span className="text-white/50"> 
                     your word is...
                 </span>
-                <span className={`max-[400px]:text-5xl text-6xl font-bold ${isImposter? 'text-red-900': 'text-green-900'}`}> 
+                <span className={`max-[400px]:text-5xl text-6xl font-bold ${isImposter? 'text-[#e0263f]': 'text-[#5DCAA5]'}`}> 
                     {word}
                 </span>
                 <span className="flex justify-center text-xs text-white/50">

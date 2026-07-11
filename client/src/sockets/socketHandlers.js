@@ -36,13 +36,14 @@ export function registerSocketHandlers() {
     })
 
     socket.on(EVENTS.ROOM_UPDATE, (room)=>{
+        store.setLoading(false);
         store.setRoom(room);
         store.setScreen(room.phase)
-        console.log(room);
     })
 
     socket.on(EVENTS.ROOM_LEFT, ()=>{
         store.setScreen('home');
+        store.setLoading(false);
         store.setRoom(null);
         store.setPlayerName('');
     })
@@ -50,13 +51,32 @@ export function registerSocketHandlers() {
         store.setScreen('home');
         store.setRoom(null);
         store.setPlayerName('');
+        store.setLoading(false);
+
     })
     socket.on(EVENTS.CHAT_MESSAGE,(mes) =>{
         store.addChatMessage(mes);
+        store.setLoading(false);
     })
 
-    socket.on(EVENTS.GAME_WORD,({word, role})=> {
+    socket.on(EVENTS.GAME_STARTING,({word, role})=> {
         store.setPlayerRole({word, role});
         store.setScreen('starting');
+        store.setLoading(false);
+
     })
+    socket.on(EVENTS.HINT_SUBMITTED, (room)=>{
+        store.setLoading(false);
+        store.setRoom(room);
+        store.setScreen(room.phase)
+    })
+    socket.on(EVENTS.VOTE_SUBMITTED, (room)=>{
+        store.setLoading(false);
+        store.setRoom(room);
+        store.setScreen(room.phase)
+    })
+    socket.on(EVENTS.ROUND_END, (roundResult) => {
+        store.setLoading(false);
+        store.setEliminated(roundResult);
+    });
 }

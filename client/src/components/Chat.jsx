@@ -45,7 +45,7 @@ function Chat() {
 
       <div className="flex flex-col flex-1 min-h-0">
 
-        <div className="flex-1 min-h-[130px] overflow-y-auto flex flex-col gap-2 p-1 hide-scrollbar">
+        <div className="flex-1 min-h-[200px] max-[930px]:max-h-[200px] overflow-y-auto flex flex-col gap-2 p-1 hide-scrollbar">
 
           {chatMessages.length === 0 && (
             <div className="flex-1 flex items-center justify-center text-white/20 text-sm">

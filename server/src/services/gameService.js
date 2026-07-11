@@ -7,11 +7,7 @@ function selectWord(){
     return words[randomIndex];
 }
 
-function selectImposter(roomCode){
-    const room = rooms.get(roomCode.toUpperCase());
-    if (!room) {
-        throw new Error("Room not found.");
-    }
+function selectImposter(room){
 
     const players = [...room.players.values()]
     const randomIndex = Math.floor(Math.random() * players.length);
@@ -23,7 +19,12 @@ function selectImposter(roomCode){
 
 function markCompleted(room , socketId){
     room.phaseCompleted.add(socketId);
-    return room.phaseCompleted.size === room.players.size   
+    if(room.phaseCompleted.size === getActivePlayers(room).length ){
+        if(room.timers.current)
+            clearTimeout(room.timers?.current);
+        return true;
+    }
+    return false
 }
 
 function addHint(socketID, room, hint){
@@ -49,7 +50,7 @@ function markVoted(socketId, room, playerId){
 }
 
 function getActivePlayers(room) {
-    return [...room.players.values()].filter(p => !p.isEliminated);
+    return [...room.players.values()].filter(p => !p.isEliminated && p.isConnected);
 }
 
 function resolveVotes(room) {

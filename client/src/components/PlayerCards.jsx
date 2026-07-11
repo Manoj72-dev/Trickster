@@ -32,7 +32,7 @@ function PlayerCard( {
                 <div 
                   key={player.id}
                   onClick = {() => {
-                    if(isVotingPhase && !Me.hasVoted && (Me.id !== player.id) && isEliminated){
+                    if(isVotingPhase && !Me.hasVoted && (Me.id !== player.id) && !isEliminated){
                       setSelected(player.id);
                     }
                   }}

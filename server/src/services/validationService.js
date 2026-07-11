@@ -2,13 +2,31 @@ const { rooms, connection } = require('../store/rooms')
 const { success, fail } = require('../utils/validationResult')
 
 
-function validateName(playerName){
-    name = playerName.trim();
-    if(!playerName || name.length <3 || name.length >12){
-        return fail('Name must be between 3 and 12 characters long.')
+function validateName(playerName, room = false) {
+    if (!playerName) {
+        return fail('Name must be between 3 and 12 characters long.');
     }
+
+    const name = playerName.trim();
+
+    if (name.length < 3 || name.length > 12) {
+        return fail('Name must be between 3 and 12 characters long.');
+    }
+
+    if (room) {
+        const nameTaken = [...room.players.values()].some(
+            player => player.name.toLowerCase() === name.toLowerCase()
+        );
+
+        if (nameTaken) {
+            return fail('Someone already has that name in the room.');
+        }
+    }
+
     return success();
 }
+
+
 
 function validateRoom(roomCode){
     const code = roomCode.toUpperCase();
@@ -128,6 +146,13 @@ function validateHasVoted(player){
     return success();
 }
 
+function validateHasSubmitted(player){
+    if(player.hasSubmittedHint){
+        return fail('You have already submitted hint.');
+    }
+    return success()
+}
+
 function validateMessageLenght(message){
     if(message?.length > 200){
         return fail('Message is too long.');
@@ -135,5 +160,25 @@ function validateMessageLenght(message){
     return success();
 }
 
+function validateStartingCondition(room){
+    if(room.players.size < 3){
+        return fail('At least need 3 players to start game.')
+    }
+    if([...room.players.values()].some(player => !player.isReady)){
+        return fail('All Players are not ready.');
+    }
+    return success();
+}
 
-module.exports = { validateRoom, validatePlayer, validateHost, validatePhase, validateSettings, validateHasVoted, validateName, validateRoomCapacity, validateMessageLenght };
+function validateHint(hint) {
+    const text = hint.trim();
+
+    if (text.length < 3 || text.length > 40) {
+        return fail("Hint must be between 3 and 40 characters.");
+    }
+
+    return success();
+}
+
+module.exports = { validateRoom, validatePlayer, validateHost, validatePhase, validateSettings, validateHasVoted, validateName, validateRoomCapacity, 
+    validateMessageLenght, validateStartingCondition, validateHasSubmitted, validateHint };

@@ -4,7 +4,7 @@ import { MdOutlineTimer } from "react-icons/md";
 import { useGameState } from "../hooks/useGameState";
 
 import SubmitSection from "../components/Hint/submitSection";
-import PlayerCards from "../components/Hint/PlayerCards";
+import PlayersList from "../components/PlayersList";
 import Timer from '../components/Timer'
 function HintPhase(){
     const hintTime = useGameState(state=> state.room.settings.hintTime)    
@@ -12,32 +12,35 @@ function HintPhase(){
         return null;
     }
     return(
-        <>
-        <div className="flex flex-col min-h-[60px] bg-black/90">
-                <div className="flex flex-1 text-white">
-                    <div className="flex justify-center items-center ml-4 font-bold font-mono text-2xl">
-                        <span className="text-red-500/70">TRICK</span>
-                        <span>STER</span>
+        <div>
+            <div className="flex flex-col min-h-[60px] bg-black/90">
+                    <div className="flex flex-1 text-white">
+                        <div className="flex justify-center items-center ml-4 font-bold font-mono text-2xl">
+                            <span className="text-red-500/70">TRICK</span>
+                            <span>STER</span>
+                        </div>
                     </div>
-                </div>
-                <hr className="text-gray-700/70"/>
-        </div>
-        <div className="flex flex-col gap-2 p-2 pt-0 ">
-            <div className="flex justify-between items-center p-2 font-mono" >
-                <div className="flex gap-2 items-center">
-                    <span className="font-bold text-lg md:text-xl text-white/80 lg:text-xl"> Hint Phase </span>
-                    
-                </div>
-                <Timer value={hintTime}/>
+                    <hr className="text-gray-700/70"/>
             </div>
-            <div className="p-3 grid gap-5 grid-cols-2 max-[800px]:grid-cols-1 min-h-[580px] ">
+            <div className='flex p-2 justify-between font-mono px-2'>
+                <span className='flex items-center text-white/90 text-xl sm:text-2xl mx-3 font-bold'>
+                    Hint Phase
+                </span>
+                <div className="mr-2">
+                    <Timer value={
+                        hintTime
+                    }/>
+                 </div>
+        </div>
+            
+            <div className="p-3 grid gap-4 grid-cols-2 max-[920px]:grid-cols-1 pt-1">
                 <SubmitSection />
-                <PlayerCards />
+                <PlayersList />
             <div />
             </div>
 
-        </div>
-    </>
+        
+    </div>
     )
 }
 
