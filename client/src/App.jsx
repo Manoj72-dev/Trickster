@@ -14,6 +14,7 @@ import RoundStart from './pages/RoundStart'
 import HintPhase from './pages/HintPhase'
 import VotingPhase from './pages/VotingPhase'
 import RoundEnd from './pages/RoundEnd'
+import Result from './pages/Result'
 import Toast from './components/Toast' 
 
 function GameScreen() {
@@ -43,7 +44,11 @@ function GameScreen() {
     elimination: {
       component: RoundEnd,
       present: 'fade',
-    }
+    },
+    ended: {
+      component: Result,
+      presets: 'fade',
+    },
   };
 
   const current = screens[screen];

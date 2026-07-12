@@ -98,7 +98,8 @@ function endVoting(io, room){
                 reason: gameEndCheck.reason,
                 imposterId: room.imposterId,
             };
-            io.to(room.roomCode).emit('game:end', room.result);
+            console.log("ending")
+            io.to(room.roomCode).emit(EVENTS.GAME_OVER, room.result);
         } else {
             room.round.current += 1;
             room.round.hints.clear();
