@@ -3,7 +3,7 @@ import { MdOutlineTimer } from "react-icons/md";
 
 import { useGameState } from "../hooks/useGameState";
 
-import SubmitSection from "../components/Hint/submitSection";
+import SubmitSection from "../components/Hint/SubmitSection";
 import PlayersList from "../components/PlayersList";
 import Timer from '../components/Timer'
 function HintPhase(){
