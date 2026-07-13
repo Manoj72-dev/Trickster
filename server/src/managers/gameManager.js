@@ -5,9 +5,13 @@ const {
     getActivePlayers, resolveVotes, eliminatePlayer, checkGameEnd,
     selectWord, selectImposter
 } = require('../services/gameService');
-const { EVENTS } = require('../sockets/socketEvents');
 
-const ELIMINATION_SCREEN_DURATION = 10000;
+const { resetRoom, removePlayer } = require('../services/roomService');
+const { EVENTS } = require('../sockets/socketEvents');
+const words = require('../store/words');
+const { find } = require('../store/words');
+
+const ELIMINATION_SCREEN_DURATION = 6000;
 
 function startGame(io, room){
         
@@ -92,14 +96,16 @@ function endVoting(io, room){
 
     room.timers.current = setTimeout(() => {
         if (gameEndCheck.isGameOver) {
+            const imposter = [...room.players.values()].find(player => player.id === room.imposterId);
             room.phase = 'ended';
             room.result = {
                 winner: gameEndCheck.winner,
                 reason: gameEndCheck.reason,
-                imposterId: room.imposterId,
+                imposter: imposter,
+                words: room.words
             };
-            console.log("ending")
-            io.to(room.roomCode).emit(EVENTS.GAME_OVER, room.result);
+            io.to(room.roomCode).emit(EVENTS.GAME_OVER, getPublicRoomObject(room));
+            resetRoom(room);
         } else {
             room.round.current += 1;
             room.round.hints.clear();
@@ -136,4 +142,19 @@ function hintSubmit(io, socketId, room, hint){
     }
 }
 
-module.exports = { startGame, startNewRound, hintSubmit, voteSubmisision, endVoting };
+function returnToHome(io, socket, room){
+    const result = removePlayer(room, socket.id);
+
+    if(!result.success){
+        sendError(socket, result.message);
+        return;
+    }
+    socket.leave(room.roomCode);
+    socket.emit(EVENTS.ROOM_LEFT);
+}
+
+function returnToLobby(io, socket, room){
+    socket.emit(EVENTS.ROOM_UPDATE, getPublicRoomObject(room))
+}
+
+module.exports = { startGame, startNewRound, hintSubmit, voteSubmisision, endVoting, returnToHome, returnToLobby };

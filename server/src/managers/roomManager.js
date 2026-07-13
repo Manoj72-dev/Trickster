@@ -104,7 +104,7 @@ function changeRoomSettings(io, room, settings){
         sendError(socket, result.message);
         return;
     }
-    console.log(room);
+
     io.to(room.roomCode).emit(EVENTS.ROOM_UPDATE, getPublicRoomObject(room));
 }
 

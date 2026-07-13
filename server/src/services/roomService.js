@@ -91,4 +91,34 @@ function changeSettings( room, settings) {
     return {success: true}
 }
 
-module.exports = { createRoom, joinRoom, removePlayer, getRoom, getPlayer, makeHost, togglePlayer, changeSettings };
+function resetRoom(room){
+    room.phase = 'lobby';
+    room.imposterId = null;
+    room.words = {
+        real: null,
+        imposter: null,
+    },
+    room.phaseCompleted = new Set();
+    room.players.forEach(player => {
+        player.isReady= false,
+        player.isEliminated = false,
+        player.hasSubmittedHint = false,
+        player.hasVoted = false
+    });
+    room.round = {
+        current: 1,
+        hints: new Map(),
+        votes: new Map(),
+        tieOccurred: false,
+    }
+    clearInterval(room.timers.current);
+    room.timers = {
+      current: null,
+      endTime: null,
+      connectionCheck: null,
+    }
+    room.result= null
+
+}
+
+module.exports = { createRoom, joinRoom, removePlayer, getRoom, getPlayer, makeHost, togglePlayer, changeSettings, resetRoom };

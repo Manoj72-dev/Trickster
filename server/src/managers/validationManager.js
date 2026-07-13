@@ -164,6 +164,11 @@ function validateVoteSubmission(socket, roomCode, playerId){
         return sendError(socket, player2Result.message);
     }
 
+    const phaseResult = validatePhase(roomResult.room, 'voting');
+    if(!phaseResult.success){
+        return sendError(socket, hostresult.message);
+    }
+
     const result = validateHasVoted(player1Result.player);
     if(!result.success){
         return sendError(socket, result.message);
@@ -185,13 +190,11 @@ function validateMessage(socket, roomCode, message){
         return sendError(socket, playerResult.message);
     }
     const phaseResult = validatePhase(roomResult.room, 'lobby');
-    if(!phaseResult.success){
-        return sendError(socket, phaseResult.message)
-    }
 
     const phase2Result = validatePhase(roomResult.room, 'voting');
-    if(!phaseResult.success){
-        return sendError(socket, phaseResult.message)
+
+    if(!phaseResult.success && !phaseResult.success){
+        return sendError(socket, 'Can not send message in this phase of game')
     }
 
     const lengthResult = validateMessageLenght(message);
@@ -245,6 +248,7 @@ function validateRound(socket, roomCode){
     if(!playerResult.success){
         return sendError(socket, playerResult.message);
     }
+    
 
     return success({
         room: roomResult.room
@@ -262,6 +266,11 @@ function validateHintSubmission(socket, roomCode, hint){
         return sendError(socket, playerResult.message);
     }
 
+    const phaseResult = validatePhase(roomResult.room, 'hint');
+    if(!phaseResult.success){
+        return sendError(socket, hostresult.message);
+    }
+
     const submissionResult = validateHasSubmitted(playerResult.player);
     if(!submissionResult.success){
         return sendError(socket, submissionResult.message);
@@ -272,9 +281,31 @@ function validateHintSubmission(socket, roomCode, hint){
         return sendError(socket, hintResult.message);
     }
 
+
     return success({
         room: roomResult.room
     });
 }
+
+function validateRequest(socket, roomCode){
+    const roomResult = validateRoom(roomCode);
+    if(!roomResult.success){
+        return sendError(socket, roomResult.message);
+    }
+
+    const playerResult = validatePlayer(roomResult.room, socket.id);
+    if(!playerResult.success){
+        return sendError(socket, playerResult.message);
+    }
+    
+    const phaseResult = validatePhase(roomResult.room, 'lobby');
+    if(!phaseResult.success){
+        return sendError(socket, phaseResult.message);
+    }
+    return success({
+        room: roomResult.room
+    });
+}
+
 module.exports = { validateCreate, validateJoin, validateLeave, validateSettingsChange , validateToggle, validateCanBe, validateVoteSubmission, validateMessage, 
-    validateStartGame, validateRound, validateHintSubmission}
+    validateStartGame, validateRound, validateHintSubmission, validateRequest}

@@ -1,9 +1,5 @@
-const { getPublicRoomObject } = require("../models/Room");
-const { getRoom } = require("../services/roomService")
-const { selectWord, selectImposter, markCompleted } = require('../services/gameService')
-
-const { startGame, startNewRound, hintSubmit, voteSubmisision } = require('../managers/gameManager');
-const { validateStartGame, validateRound, validateHintSubmission, validateVoteSubmission } = require('../managers/validationManager');
+const { startGame, startNewRound, hintSubmit, voteSubmisision, returnToHome, returnToLobby } = require('../managers/gameManager');
+const { validateStartGame, validateRound, validateHintSubmission, validateVoteSubmission, validateRequest } = require('../managers/validationManager');
 
 const { EVENTS } = require('./socketEvents');
 
@@ -49,4 +45,26 @@ module.exports = (io, socket) =>{
 
         voteSubmisision(io, socket.id, result.room, playerId);
     });
+
+    socket.on(EVENTS.RETURN_HOME, ({roomCode}) => {
+
+    })
+    socket.on(EVENTS.RETURN_LOBBY, ({roomCode}) => {
+        const result = validateRequest(socket, roomCode);
+        if(!result.success){
+            console.log(result.message);
+            return
+        }
+        returnToLobby(io, socket, result.room);
+    })
+
+    socket.on(EVENTS.RETURN_HOME, ({roomCode})=>{
+        const result = validateRequest(socket, roomCode);
+        if(!result.success){
+            console.log(result.message);
+            return
+        }
+        returnToHome(io, socket, result.room);
+    })
+
 }

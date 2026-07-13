@@ -26,8 +26,6 @@ function getPublicPlayerObject(player) {
     isConnected: player.isConnected,
     hasSubmittedHint: player.hasSubmittedHint,
     hasVoted: player.hasVoted,
-    hint: player.hint,
-    // excluded: vote, eliminatedReason
   };
 }
 
