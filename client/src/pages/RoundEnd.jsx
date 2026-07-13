@@ -42,7 +42,7 @@ function RoundEnd(){
                 setCurrentWord(0);
             }
         }, currentWord < text.length ? 50:700)
-        console.log(currentMessage, currentWord);
+
         return ()=> clearTimeout(timeout)
     },[currentMessage, currentWord, eliminat])
 

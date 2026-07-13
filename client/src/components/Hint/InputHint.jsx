@@ -7,7 +7,7 @@ function InputHint(){
     const roomCode = useGameState(state => state.room.roomCode);
     const me = useGameState(state=> state.getMe());
     const loading = useGameState(state=> state.loading);
-
+    const setError = useGameState(state => state.setError);
 
     if(!roomCode)
         return null;
@@ -18,7 +18,7 @@ function InputHint(){
         const trimmedHint = hint.trim();
 
         if (!trimmedHint) {
-            alert("Hint is required");
+            setError("Hint is required");
             return false;
         }
 

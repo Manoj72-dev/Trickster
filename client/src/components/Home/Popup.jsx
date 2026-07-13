@@ -43,19 +43,19 @@ function Popup({ type, close, setButton }) {
     const name = playerName.trim();
 
     if (!name) {
-      alert("Player name is required.");
+      setError("Player name is required.");
       nameInputRef.current?.focus();
       return;
     }
 
     if (name.length < 3) {
-      alert("Player name must be at least 3 characters.");
+      setError("Player name must be at least 3 characters.");
       nameInputRef.current?.focus();
       return;
     }
 
     if (name.length > 12) {
-      alert("Player name cannot be longer than 12 characters.");
+      setError("Player name cannot be longer than 12 characters.");
       nameInputRef.current?.focus();
       return;
     }

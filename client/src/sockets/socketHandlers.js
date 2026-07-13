@@ -79,7 +79,8 @@ export function registerSocketHandlers() {
         store.setLoading(false);
         store.setEliminated(roundResult);
     });
-    socket.on(EVENTS.GAME_OVER, (result) => {
-        store.setScreen('ended');
+    socket.on(EVENTS.GAME_OVER, (room) => {
+        store.setRoom(room);
+        store.setScreen(room.phase);
     })
 }

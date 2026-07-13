@@ -19,7 +19,6 @@ export function startRound(roomCode){
     emit(EVENTS.ROUND_START, {roomCode})
 }
 
-
 export function startHintPhase(roomCode, phase){
     const { setLoading, setError } = useGameStore.getState()
     setLoading(true);
@@ -39,4 +38,18 @@ export function submitVote(roomCode, playerId){
     setLoading(true);
     setError(null);
     emit(EVENTS.VOTE_SUBMIT, {roomCode, playerId})
+}
+
+export function returnHome(roomCode){
+    const { setLoading, setError } = useGameStore.getState()
+    setLoading(true);
+    setError(null);
+    emit(EVENTS.RETURN_HOME, {roomCode});
+}
+
+export function returnLobby(roomCode){
+    const { setLoading, setError } = useGameStore.getState()
+    setLoading(true);
+    setError(null);
+    emit(EVENTS.RETURN_LOBBY, {roomCode});
 }
