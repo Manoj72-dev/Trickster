@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useGameActions } from "../hooks/useGameActions";
 
 import Timer from '../components/Timer';
-import PlayerCards from "../components/PlayerCards";
+import PlayerList from '../components/PlayersList'
 import Chat from "../components/Chat";
 import HintCards from "../components/HintCards";
 
@@ -40,13 +40,7 @@ function VotingPhase(){
             </div>
             <div className=" grid grid-cols-2 max-[800px]:grid-cols-1 min-h-[580px] ">
                 <div className="flex flex-col gap-2 ">
-                    <div className="flex flex-col">
-                        <span className="text-white/80 font-mono font-bold text-xl p-2">PLAYERS</span>
-                        <PlayerCards 
-                            selected={selected}
-                            setSelected={ setSelected}
-                        />          
-                    </div>
+                    <PlayerList/>
                     
                     <div className="flex justify-end items-center p-3">
                         <button 
@@ -57,10 +51,11 @@ function VotingPhase(){
                             Vote
                         </button>
                     </div>
-                    <HintCards/>
 
                 </div>
                 <div className="">
+                                        <HintCards/>
+
                     <Chat/>
                 </div>
                 

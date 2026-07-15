@@ -4,14 +4,14 @@ function HintCards(){
     const hints = useGameState(state => state.room.round.hints)
     return(
         <>
-            <div className="flex flex-col ">
+            <div className="flex flex-col flex-1 font-mono min-h-[200px]">
                 <div className="text-white/80 font-bold p-2 pb-0" >
                     HINTS SUBMITED
                 </div>
-                <div className="flex flex-wrap p-4 gap-3">
+                <div className="flex flex-wrap flex-1 h-full p-4 gap-3 border border-white rounded-xl">
                     {(!hints || hints.length === 0)?
                         <>
-                            <div className="text-white/80">
+                            <div className="flex w-full  items-center justify-center text-white/80">
                                 No hints submitted.
                             </div>
                         </>
