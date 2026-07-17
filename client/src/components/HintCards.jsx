@@ -4,11 +4,11 @@ function HintCards(){
     const hints = useGameState(state => state.room.round.hints)
     return(
         <>
-            <div className="flex flex-col flex-1 font-mono min-h-[200px]">
+            <div className="flex flex-col flex-1 font-mono min-h-[200px] border">
                 <div className="text-white/80 font-bold p-2 pb-0" >
                     HINTS SUBMITED
                 </div>
-                <div className="flex flex-wrap flex-1 h-full p-4 gap-3 border border-white rounded-xl">
+                <div className="flex flex-1 h-full p-4 gap-3 border border-white rounded-xl overflow-x-auto">
                     {(!hints || hints.length === 0)?
                         <>
                             <div className="flex w-full  items-center justify-center text-white/80">
@@ -19,7 +19,7 @@ function HintCards(){
                         <>
                             {hints.map((hint) => (
                                 <div 
-                                    className="flex flex-col border rounded-xl bg-gray-700/40 border-gray-700/70 min-w-[100px] max-w-[200px] gap-4"
+                                    className="flex flex-col border rounded-xl bg-gray-700/40 border-gray-700/70 min-w-[300px] max-w-[200px] gap-4"
                                     key={hint.playerId}
                                 >
                                     <div className="flex gap-2 p-2 items-center border-b border-gray-700">
@@ -30,7 +30,7 @@ function HintCards(){
                                             {hint.playerName}
                                         </span>
                                     </div>
-                                    <span className="text-white/80 text-lg p-2">
+                                    <span className="flex justify-center item-center text-white/80 text-lg p-2">
                                         {hint.hint}
                                     </span>
                                 </div>

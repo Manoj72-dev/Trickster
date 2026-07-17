@@ -12,7 +12,7 @@ function HintPhase(){
         return null;
     }
     return(
-        <div>
+        <div className="border border-white">
             <div className="flex flex-col min-h-[60px] bg-black/90">
                     <div className="flex flex-1 text-white">
                         <div className="flex justify-center items-center ml-4 font-bold font-mono text-2xl">
@@ -31,9 +31,9 @@ function HintPhase(){
                         hintTime
                     }/>
                  </div>
-        </div>
+            </div>
             
-            <div className="p-3 grid gap-4 grid-cols-2 max-[920px]:grid-cols-1 pt-1">
+            <div className="p-3 grid gap-4 grid-cols-2 max-[920px]:grid-cols-1 pt-1 border border-white">
                 <SubmitSection />
                 <PlayersList />
             <div />

@@ -30,7 +30,7 @@ function VotingPhase(){
                 </div>
                 <hr className="text-gray-700/70"/>
         </div>
-        <div className="flex flex-col gap-2 p-2 pt-0 ">
+        <div className="flex flex-col gap-2 p-2 pt-0 border border-white">
             <div className="flex justify-between items-center p-2 font-mono" >
                 <div className="flex gap-2 items-center">
                     <span className="font-bold text-lg md:text-xl text-white/80 lg:text-xl"> Voting Phase </span>
@@ -38,7 +38,7 @@ function VotingPhase(){
                 </div>
                 <Timer value={voteTime}/>
             </div>
-            <div className=" grid grid-cols-2 max-[800px]:grid-cols-1 min-h-[580px] ">
+            <div className=" grid grid-cols-2 max-[800px]:grid-cols-1  ">
                 <div className="flex flex-col gap-2 ">
                     <PlayerList/>
                     
@@ -53,10 +53,10 @@ function VotingPhase(){
                     </div>
 
                 </div>
-                <div className="">
-                                        <HintCards/>
-
-                    <Chat/>
+                <div className="flex flex-col gap-2 ">
+                    <HintCards/>
+                        <Chat/>
+                    
                 </div>
                 
                 

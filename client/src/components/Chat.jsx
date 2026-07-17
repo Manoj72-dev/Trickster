@@ -37,15 +37,15 @@ function Chat() {
   };
 
   return (
-    <div className="flex flex-col h-full font-mono border p-4 border-white/80 rounded-xl bg-[#0D1117]">
+    <div className="flex flex-col flex-1 font-mono border p-4 border-white/80 rounded-xl bg-[#0D1117]">
       <span className="flex items-center gap-2 text-white/80 mb-3">
         <PiChatsCircleFill size={20} />
         Chats
       </span>
 
-      <div className="flex flex-col flex-1 min-h-0">
+      <div className="flex flex-col flex-1 h-full min-h-0">
 
-        <div className="flex-1 min-h-[200px] max-[930px]:max-h-[200px] overflow-y-auto flex flex-col gap-2 p-1 hide-scrollbar">
+        <div className="flex-1 min-h-[200px] overflow-y-auto flex flex-col gap-2 p-1 hide-scrollbar ">
 
           {chatMessages.length === 0 && (
             <div className="flex-1 flex items-center justify-center text-white/20 text-sm">
